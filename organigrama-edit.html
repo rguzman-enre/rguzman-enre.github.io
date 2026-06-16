@@ -1141,7 +1141,7 @@
             // ==================== COLLECT ALL NODES ====================
             function collectAllNodes(node = organigramaData, result = []) {
                 if (!node) return result;
-                result.push({ id: node.id, name: node.shortName || node.name, type: node.type });
+                result.push({ id: node.id, name: node.name || node.shortName, type: node.type });
                 if (node.children) {
                     for (const child of node.children) {
                         collectAllNodes(child, result);
@@ -1202,7 +1202,7 @@
                 document.getElementById('cancelEditBtn').style.display = 'inline-flex';
                 document.getElementById('deleteNodeBtn').style.display = 'inline-flex';
                 document.getElementById('saveNodeBtn').textContent = '✏️ Actualizar Nodo';
-                document.getElementById('formTitle').textContent = 'Editar: ' + (node.shortName || node.name);
+                document.getElementById('formTitle').textContent = 'Editar: ' + (node.name || node.shortName);
                 populateParentSelect();
                 const parent = findParentNode(nodeId);
                 if (parent) {
@@ -1300,7 +1300,7 @@
                 }
                 const node = findNodeById(editingNodeId);
                 if (!node) return;
-                const nodeName = node.shortName || node.name;
+                const nodeName = node.name || node.shortName;
                 const childCount = node.children ? node.children.length : 0;
                 let confirmMsg = `¿Eliminar "${nodeName}"?`;
                 if (childCount > 0) {
@@ -1380,7 +1380,7 @@
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'name';
-                nameSpan.textContent = node.shortName || node.name;
+                nameSpan.textContent = node.name || node.shortName;
                 nameSpan.title = node.name;
                 row.appendChild(nameSpan);
 

@@ -1404,7 +1404,7 @@
                     badge.className = 'match-type badge-' + result.matchType;
                     badge.textContent = result.matchField;
                     item.appendChild(badge);
-                    const text = document.createTextNode(result.node.shortName || result.node.name);
+                    const text = document.createTextNode(result.node.name || result.node.shortName);
                     item.appendChild(text);
                     item.addEventListener('click', () => {
                         navigateToNode(result.node);
