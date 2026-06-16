@@ -1191,7 +1191,7 @@
                 info.className = 'node-info';
                 const nameEl = document.createElement('div');
                 nameEl.className = 'node-name';
-                nameEl.textContent = node.shortName || node.name;
+                nameEl.textContent = /*node.shortName ||*/ node.name || node.shortName;
                 info.appendChild(nameEl);
 
                 if (node.responsables && node.responsables.length > 0 && node.responsables[0] !== '') {
