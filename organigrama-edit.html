@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organigrama ENREGE - Edición</title>
+    <style>
+        :root {
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --surface-alt: #f8fafc;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --color-directorio: #1e293b;
+            --color-transversal: #6366f1;
+            --color-gas: #f59e0b;
+            --color-electricidad: #3b82f6;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
+        }
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+        .header-logo .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .btn.primary {
+            background: #6366f1;
+            color: #fff;
+            border-color: #6366f1;
+        }
+        .btn.primary:hover {
+            background: #4f46e5;
+        }
+        .btn.success {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+        }
+        .btn.success:hover {
+            background: #059669;
+        }
+        .btn.danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+        .btn.danger:hover {
+            background: #fee2e2;
+        }
+        .btn.outline {
+            background: transparent;
+            border: 2px dashed #cbd5e1;
+        }
+
+        /* ========== LAYOUT ========== */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 420px;
+            min-width: 380px;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 5;
+        }
+        .sidebar-content {
+            padding: 16px 20px;
+            flex: 1;
+        }
+        .preview-panel {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: #fafbfc;
+        }
+        .preview-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== FORM ========== */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: var(--transition);
+            background: var(--surface-alt);
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: #fff;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .tag-gas {
+            background: #fffbeb;
+            color: #b45309;
+        }
+        .tag-elec {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        .tag-trans {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+        .tag-dir {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        /* ========== TREE MINI ========== */
+        .mini-tree {
+            font-size: 0.78rem;
+        }
+        .mini-node {
+            padding: 7px 10px;
+            margin: 3px 0;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1.5px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            user-select: none;
+        }
+        .mini-node:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+        .mini-node.selected {
+            border-color: #6366f1 !important;
+            background: #eef2ff !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .mini-node .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .mini-node .dot.gas {
+            background: #f59e0b;
+        }
+        .mini-node .dot.electricidad {
+            background: #3b82f6;
+        }
+        .mini-node .dot.transversal {
+            background: #6366f1;
+        }
+        .mini-node .dot.directorio {
+            background: #1e293b;
+        }
+        .mini-node .name {
+            flex: 1;
+            font-weight: 600;
+            color: #334155;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mini-children {
+            margin-left: 16px;
+            border-left: 2px solid #e2e8f0;
+            padding-left: 8px;
+        }
+        .mini-children.collapsed {
+            display: none;
+        }
+        .mini-toggle {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.55rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #64748b;
+            transition: var(--transition);
+        }
+        .mini-toggle:hover {
+            background: #e2e8f0;
+        }
+
+        /* ========== TOAST ========== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.success {
+            background: #10b981;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.info {
+            background: #6366f1;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+        }
+        .modal h3 {
+            margin-bottom: 16px;
+        }
+        .modal .btn {
+            margin-top: 8px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                max-height: 50vh;
+            }
+            .preview-panel {
+                max-height: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-logo">
+            <div class="icon">✏️</div>
+            <span>Editor de Organigrama - ENREGE</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn outline" id="exportBtn" title="Descargar JSON">📥 Exportar JSON</button>
+            <label class="btn outline" style="cursor:pointer;" title="Importar JSON">📤 Importar JSON
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+            </label>
+            <button class="btn danger" id="resetBtn" title="Restaurar datos originales">🔄 Restaurar</button>
+            <a href="visualizacion.html" class="btn primary" target="_blank">👁️ Ver Organigrama</a>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+        <!-- SIDEBAR - Formulario -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">📝 <span id="formTitle">Agregar Nuevo Nodo</span></div>
+            <div class="sidebar-content" id="sidebarContent">
+                <div id="formContainer">
+                    <!-- Formulario dinámico -->
+                    <div class="form-group">
+                        <label>Nombre Completo de la Unidad *</label>
+                        <input type="text" id="nodeName" placeholder="Ej: UNIDAD DE EJEMPLO">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre Corto / Abreviatura</label>
+                        <input type="text" id="nodeShortName" placeholder="Ej: U. Ejemplo">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo *</label>
+                            <select id="nodeType">
+                                <option value="directorio">🏛️ Directorio</option>
+                                <option value="transversal">🔄 Transversal</option>
+                                <option value="gas">🔥 Gas</option>
+                                <option value="electricidad">⚡ Electricidad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nodo Padre *</label>
+                            <select id="nodeParent">
+                                <option value="">Seleccionar padre...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsables (separados por coma)</label>
+                        <textarea id="nodeResponsables" placeholder="Ej: PÉREZ, Juan (gas), GÓMEZ, Ana (elec)"></textarea>
+                    </div>
+                    <input type="hidden" id="editingNodeId" value="">
+                    <div class="form-actions">
+                        <button class="btn success" id="saveNodeBtn">💾 Guardar Nodo</button>
+                        <button class="btn" id="cancelEditBtn" style="display:none;">❌ Cancelar Edición</button>
+                        <button class="btn danger" id="deleteNodeBtn" style="display:none;">🗑️ Eliminar Nodo</button>
+                    </div>
+                    <div style="margin-top:12px; padding:10px; background:#fffbeb; border-radius:6px; font-size:0.75rem; color:#92400e;">
+                        ⚠️ <strong>Importante:</strong> Los cambios se guardan automáticamente en tu navegador. Usa "Exportar JSON" para respaldar.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREVIEW PANEL -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-title">🗂️ Vista Previa del Organigrama</div>
+            <div class="mini-tree" id="miniTree"></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- MODAL oculto para confirmaciones -->
+    <div class="modal-overlay" id="modalOverlay" style="display:none;">
+        <div class="modal" id="modalContent"></div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== DATOS INICIALES ====================
+            const initialData = {
+                "id": "ENREGE",
+                "name": "ENTE NACIONAL REGULADOR DEL GAS Y LA ELECTRICIDAD (ENREGE)",
+                "shortName": "ENREGE",
+                "type": "directorio",
+                "responsables": [],
+                "children": [{
+                    "id": "USECDIR",
+                    "name": "UNIDAD DE SECRETARÍA DEL DIRECTORIO",
+                    "shortName": "Sec. Directorio",
+                    "type": "transversal",
+                    "responsables": ["PONCE QUINTERO, M. Alejandra (gas)", "SANZ, Ignacio (elec)"],
+                    "children": [
+                        { "id": "USECDIR_1", "name": "Administración de la Documentación y Revisiones",
+                            "shortName": "Adm. Documentación", "type": "gas",
+                            "responsables": ["ARCE, María Cecilia"], "children": [] },
+                        { "id": "USECDIR_2",
+                            "name": "Gestión de Mesa de Entradas, Salidas, Archivo y Biblioteca",
+                            "shortName": "Mesa Entradas Biblio.", "type": "gas",
+                            "responsables": ["GÓMEZ, Ana Claudia"], "children": [] },
+                        { "id": "USECDIR_3", "name": "Gestión Administrativa y de Despacho",
+                            "shortName": "Gestión Adm. Despacho", "type": "electricidad",
+                            "responsables": ["ERDINI, Andrea Laura"], "children": [
+                                { "id": "USECDIR_3_1", "name": "Registro y Despacho",
+                                    "shortName": "Registro y Despacho", "type": "electricidad",
+                                    "responsables": ["FORCHINITI, Silvia"], "children": [] }
+                            ] },
+                        { "id": "USECDIR_4", "name": "Mesa de Entradas", "shortName": "Mesa Entradas",
+                            "type": "electricidad",
+                            "responsables": ["FARINOLA, Leonardo Juan", "COSENTINO, Sergio Martín"],
+                            "children": [
+                                { "id": "USECDIR_4_1", "name": "Expedientes y Carga de Sanciones",
+                                    "shortName": "Exp. y Sanciones", "type": "electricidad",
+                                    "responsables": ["MACIEL AGREGAN, Diego"], "children": [] },
+                                { "id": "USECDIR_4_2", "name": "Recepción e Ingresos",
+                                    "shortName": "Recepción", "type": "electricidad",
+                                    "responsables": ["AYALA, Noelia"], "children": [] },
+                                { "id": "USECDIR_4_3",
+                                    "name": "Notificaciones y Otorgamiento de Visitas",
+                                    "shortName": "Notificaciones", "type": "electricidad",
+                                    "responsables": ["PEREDO VILLEGAS, Verónica"], "children": [] }
+                            ] },
+                        { "id": "USECDIR_5", "name": "Centro de Documentación y Traducciones",
+                            "shortName": "Centro Doc.", "type": "electricidad",
+                            "responsables": ["BEVILACQUA, Alejandro Juan"], "children": [] }
+                    ]
+                }, {
+                    "id": "UAI",
+                    "name": "UNIDAD DE AUDITORÍA INTERNA",
+                    "shortName": "Auditoría Interna",
+                    "type": "transversal",
+                    "responsables": ["SUAREZ TRILLO, Beatriz (gas)", "CHERRI, Leonardo Adrián (elec)",
+                        "RODRIGUEZ SERRA, M. Laura (elec)"
+                    ],
+                    "children": [
+                        { "id": "UAI_1", "name": "Auditoría Interna", "shortName": "Aud. Interna",
+                            "type": "gas", "responsables": ["CESPON, Silvia Beatriz"], "children": [] }
+                    ]
+                }, {
+                    "id": "USJ",
+                    "name": "UNIDAD SERVICIOS JURÍDICOS",
+                    "shortName": "Servicios Jurídicos",
+                    "type": "transversal",
+                    "responsables": ["ONORATI, Silvana Daniela (gas)", "BERGOGLIO, Sergio E. V. (elec)",
+                        "GORZELANY, Liliana (elec)"
+                    ],
+                    "children": [
+                        { "id": "USJ_1", "name": "Contenciosos", "shortName": "Contenciosos",
+                            "type": "electricidad", "responsables": ["SOSA, Enrique Mario"],
+                            "children": [
+                                { "id": "USJ_1_1", "name": "Oficios Judiciales y Pedidos de Informes",
+                                    "shortName": "Oficios Judiciales", "type": "electricidad",
+                                    "responsables": ["SPINELLI, María Federica"], "children": [] }
+                            ] },
+                        { "id": "USJ_2", "name": "Dictámenes", "shortName": "Dictámenes",
+                            "type": "electricidad", "responsables": ["DI PASCUAL, Gabriel Alejandro"],
+                            "children": [] },
+                        { "id": "USJ_3", "name": "Control de Gestión Legal", "shortName": "Ctrl. Gestión Legal",
+                            "type": "gas", "responsables": ["SUAREZ, Marina Iliana"], "children": [] },
+                        { "id": "USJ_4", "name": "Asuntos Regulatorios", "shortName": "Asuntos Reg.",
+                            "type": "gas", "responsables": ["BUISEL, Ramón Andrés"], "children": [] },
+                        { "id": "USJ_5", "name": "Fiscalización", "shortName": "Fiscalización", "type": "gas",
+                            "responsables": ["KRAISELBURD, Alfredo Hugo"], "children": [] },
+                        { "id": "USJ_6", "name": "Administración Interna", "shortName": "Adm. Interna",
+                            "type": "gas", "responsables": ["ROSSOTTI, Cecilia Beatriz"], "children": [] },
+                        { "id": "USJ_7", "name": "Judicial", "shortName": "Judicial", "type": "gas",
+                            "responsables": ["LANDABURU, Marcelo Bernardo"], "children": [] },
+                        { "id": "USJ_8", "name": "Usuarios", "shortName": "Usuarios", "type": "gas",
+                            "responsables": ["ARGENTIERI, Gonzalo Luis"], "children": [] },
+                        { "id": "USJ_9", "name": "Afectaciones al Dominio", "shortName": "Afect. Dominio",
+                            "type": "gas", "responsables": ["BOCACHE, Daniela Elena"], "children": [] },
+                        { "id": "USJ_10", "name": "Regulaciones Especiales", "shortName": "Reg. Especiales",
+                            "type": "gas", "responsables": ["SANTANGELO, Miriam Alejandra"],
+                        "children": [] }
+                    ]
+                }, {
+                    "id": "URHISG",
+                    "name": "UNIDAD RECURSOS HUMANOS, INSTITUCIONALES Y SEGUIMIENTO DE GESTIÓN",
+                    "shortName": "RRHH y Seguimiento",
+                    "type": "transversal",
+                    "responsables": ["SALOMONE STRUNZ, Eric Oscar (gas)",
+                        "VEGA FERNANDEZ, Néstor Adolfo (elec)"
+                    ],
+                    "children": [
+                        { "id": "URHISG_1", "name": "Seguimiento de Gestión",
+                            "shortName": "Seg. Gestión", "type": "electricidad",
+                            "responsables": ["SANTORO, Carlos Nicolás", "DE LOS SANTOS, Daniel Eduardo"],
+                            "children": [] },
+                        { "id": "URHISG_2", "name": "Relaciones Institucionales y Prensa",
+                            "shortName": "Rel. Institucionales", "type": "electricidad",
+                            "responsables": ["BRUZOS, Adriana Mónica"], "children": [
+                                { "id": "URHISG_2_1", "name": "Acceso a la Información Pública",
+                                    "shortName": "Acceso Info.", "type": "electricidad",
+                                    "responsables": ["SARMENTERO, Marcela Viviana"],
+                                "children": [] },
+                                { "id": "URHISG_2_2", "name": "Prensa", "shortName": "Prensa",
+                                    "type": "electricidad",
+                                    "responsables": ["ROOSELEER, Leandro Nicolás"],
+                                "children": [] }
+                            ] },
+                        { "id": "URHISG_3", "name": "Liquidación de Haberes",
+                            "shortName": "Liq. Haberes", "type": "electricidad",
+                            "responsables": ["CARRO, María Daniela"], "children": [] },
+                        { "id": "URHISG_4", "name": "Seguimiento y Control de Gestión",
+                            "shortName": "Seg. Ctrl. Gestión", "type": "gas",
+                            "responsables": ["CHIODI, Alejo Matías"], "children": [] },
+                        { "id": "URHISG_5", "name": "Administración de Personal",
+                            "shortName": "Adm. Personal", "type": "gas",
+                            "responsables": ["VEIGA, Patricio Hernán"], "children": [] },
+                        { "id": "URHISG_6", "name": "Relaciones Laborales", "shortName": "Rel. Laborales",
+                            "type": "gas", "responsables": ["TETTAMANTI, Nadia"], "children": [] },
+                        { "id": "URHISG_7", "name": "Capacitación y Organización",
+                            "shortName": "Capacitación", "type": "gas",
+                            "responsables": ["ANGELONE, Daniela"], "children": [] },
+                        { "id": "URHISG_8", "name": "Asuntos Institucionales",
+                            "shortName": "Asuntos Inst.", "type": "gas",
+                            "responsables": ["MATURO, Fátima del Valle"], "children": [] },
+                        { "id": "URHISG_9", "name": "Prensa y Difusión", "shortName": "Prensa y Dif.",
+                            "type": "gas", "responsables": ["LANDERO, Cristian Daniel"], "children": [] }
+                    ]
+                }, {
+                    "id": "UADM",
+                    "name": "UNIDAD ADMINISTRACIÓN",
+                    "shortName": "Administración",
+                    "type": "transversal",
+                    "responsables": ["ECHAZÚ, Darío Javier (gas)", "FERNANDEZ, Roberto (elec)"],
+                    "children": [
+                        { "id": "UADM_1", "name": "Gestión Operativa Administrativa",
+                            "shortName": "Gest. Operativa", "type": "electricidad",
+                            "responsables": ["SAPONARA, Horacio Ricardo"], "children": [] },
+                        { "id": "UADM_2", "name": "Patrimonio y Suministros",
+                            "shortName": "Patrimonio", "type": "electricidad",
+                            "responsables": ["PALUMBO, Ricardo Nicolás", "CASTELAO, Jorge Luis"],
+                            "children": [
+                                { "id": "UADM_2_1",
+                                    "name": "Gestión Administrativa de la Flota Automotor",
+                                    "shortName": "Flota Automotor", "type": "electricidad",
+                                    "responsables": ["FURNARI, Patricio"], "children": [] }
+                            ] },
+                        { "id": "UADM_3", "name": "Contabilidad", "shortName": "Contabilidad",
+                            "type": "electricidad", "responsables": ["WALLASCH, Gabriela Mariel"],
+                            "children": [] },
+                        { "id": "UADM_4", "name": "Tesorería", "shortName": "Tesorería",
+                            "type": "electricidad", "responsables": ["PÉREZ, Fernando Ernesto"],
+                            "children": [] },
+                        { "id": "UADM_5", "name": "Compras y Contrataciones",
+                            "shortName": "Compras", "type": "electricidad",
+                            "responsables": ["BARBIERI, Carina Sandra"], "children": [] },
+                        { "id": "UADM_6", "name": "Compras y Contrataciones", "shortName": "Compras (gas)",
+                            "type": "gas", "responsables": ["POZUETA, Vanesa Viviana"], "children": [] },
+                        { "id": "UADM_7", "name": "Presupuesto", "shortName": "Presupuesto", "type": "gas",
+                            "responsables": ["VERA ENRIQUE, Verónica Andrea"], "children": [] },
+                        { "id": "UADM_8", "name": "Contabilidad", "shortName": "Contabilidad (gas)",
+                            "type": "gas", "responsables": ["GOLDENBERG, Marcelo Gustavo"],
+                        "children": [] },
+                        { "id": "UADM_9", "name": "Tesorería", "shortName": "Tesorería (gas)", "type": "gas",
+                            "responsables": ["GELABERT, Lucas Miguel"], "children": [] },
+                        { "id": "UADM_10", "name": "Mantenimiento y Servicios Generales",
+                            "shortName": "Mantenimiento", "type": "gas",
+                            "responsables": ["MIMICA, Esteban Simón"], "children": [] },
+                        { "id": "UADM_11", "name": "Patrimonio", "shortName": "Patrimonio (gas)",
+                            "type": "gas", "responsables": ["MESSINA, Anabel Beatriz"], "children": [] },
+                        { "id": "UADM_12", "name": "Seguridad e Higiene", "shortName": "Seg. e Higiene",
+                            "type": "gas", "responsables": ["ASTORINO, Santiago Alejandro"],
+                        "children": [] }
+                    ]
+                }, {
+                    "id": "UTIC",
+                    "name": "UNIDAD TECNOLOGÍAS DE LA INFORMACIÓN Y COMUNICACIÓN",
+                    "shortName": "TICs",
+                    "type": "transversal",
+                    "responsables": ["SAYONI, Marcos E. (gas)", "PASCUAL, Mónica J. (elec)",
+                        "BONELLI, Fernando O. (elec)"
+                    ],
+                    "children": [
+                        { "id": "UTIC_1", "name": "Infraestructura Informática",
+                            "shortName": "Infraestructura", "type": "electricidad",
+                            "responsables": ["DE ANTUENO, Fernando"], "children": [] },
+                        { "id": "UTIC_2", "name": "Administración de Servidores",
+                            "shortName": "Servidores", "type": "electricidad",
+                            "responsables": ["RODRIGUEZ DEL RÍO, Damián"], "children": [] },
+                        { "id": "UTIC_3", "name": "Soporte Técnico y Comunicaciones",
+                            "shortName": "Soporte Técnico", "type": "electricidad",
+                            "responsables": ["MACHUCA, Pedro Guillermo"], "children": [] },
+                        { "id": "UTIC_4", "name": "Mesa de Ayuda", "shortName": "Mesa Ayuda",
+                            "type": "electricidad", "responsables": ["POZO, Mara Elizabeth"],
+                            "children": [] },
+                        { "id": "UTIC_5", "name": "Desarrollo de Sistemas Informáticos",
+                            "shortName": "Desarrollo", "type": "electricidad",
+                            "responsables": ["MOSKALUK, Hernán Guido"], "children": [] },
+                        { "id": "UTIC_6", "name": "Seguridad Informática", "shortName": "Seg. Informática",
+                            "type": "electricidad", "responsables": ["CEREIJO, Kevin"], "children": [] },
+                        { "id": "UTIC_7", "name": "Infraestructura de TI", "shortName": "Infra TI (gas)",
+                            "type": "gas", "responsables": ["JOFRE, Gabriel Alejandro"], "children": [] },
+                        { "id": "UTIC_8", "name": "Aplicaciones", "shortName": "Aplicaciones", "type": "gas",
+                            "responsables": ["ALONSO, Marcelo Javier"], "children": [] },
+                        { "id": "UTIC_9", "name": "Seguridad de la Información",
+                            "shortName": "Seg. Información", "type": "gas",
+                            "responsables": ["BARBIERI, David Roberto"], "children": [] },
+                        { "id": "UTIC_10", "name": "Innovación Tecnológica", "shortName": "Innovación",
+                            "type": "gas", "responsables": ["FLORES, Horacio Sebastián"], "children": [] }
+                    ]
+                }, {
+                    "id": "UAUG",
+                    "name": "UNIDAD ATENCIÓN INTEGRAL DE USUARIOS DE GAS",
+                    "shortName": "Atención Usuarios Gas",
+                    "type": "gas",
+                    "responsables": ["DE LA FUENTE, Claudio Oscar"],
+                    "children": [
+                        { "id": "UAUG_1", "name": "Gestión Operativa y Revisiones",
+                            "shortName": "Gest. Operativa", "type": "gas",
+                            "responsables": ["BARRETTO, Ariel"], "children": [] },
+                        { "id": "UAUG_2", "name": "Planeamiento y Apoyo Administrativo",
+                            "shortName": "Planeamiento", "type": "gas",
+                            "responsables": ["GODOY, Israel Alejandro"], "children": [] },
+                        { "id": "UAUG_3", "name": "Control de Gestión Comercial",
+                            "shortName": "Ctrl. Comercial", "type": "gas",
+                            "responsables": ["IGNES, Mario José"], "children": [] },
+                        { "id": "UAUG_4", "name": "Regulación y Normalización",
+                            "shortName": "Regulación", "type": "gas",
+                            "responsables": ["DI TRENTO, Gustavo Daniel"], "children": [] },
+                        { "id": "UAUG_5", "name": "Atención de Consultas y Reclamos",
+                            "shortName": "Consultas y Reclamos", "type": "gas",
+                            "responsables": ["FERRO, Juan Facundo Rodolfo"], "children": [] },
+                        { "id": "UAUG_6", "name": "Control de Gestión de Estándares de Calidad",
+                            "shortName": "Estándares Calidad", "type": "gas",
+                            "responsables": ["VESPRINI, Mariana Silvina"], "children": [] },
+                        { "id": "UAUG_7", "name": "Regímenes de Beneficios", "shortName": "Beneficios",
+                            "type": "gas", "responsables": ["(sin responsable asignado)"],
+                        "children": [] }
+                    ]
+                }, {
+                    "id": "UDG",
+                    "name": "UNIDAD DISTRIBUCIÓN DE GAS",
+                    "shortName": "Distribución Gas",
+                    "type": "gas",
+                    "responsables": ["LANZILLOTTI, Guillermo"],
+                    "children": [
+                        { "id": "UDG_1", "name": "Utilización del Gas", "shortName": "Utilización",
+                            "type": "gas", "responsables": ["LOPEZ, Rodrigo Damián"], "children": [] },
+                        { "id": "UDG_2", "name": "Redes", "shortName": "Redes", "type": "gas",
+                            "responsables": ["FERNANDEZ ONETO, Javier Augusto"], "children": [] },
+                        { "id": "UDG_3", "name": "Subdistribución", "shortName": "Subdistribución",
+                            "type": "gas", "responsables": ["SANTAGUIDA, Mariano Ezequiel"],
+                        "children": [] },
+                        { "id": "UDG_4", "name": "Control Técnico-Operativo", "shortName": "Ctrl. Técnico",
+                            "type": "gas", "responsables": ["COVINI, Guido Héctor"], "children": [] }
+                    ]
+                }, {
+                    "id": "UTG",
+                    "name": "UNIDAD TRANSMISIÓN DE GAS",
+                    "shortName": "Transmisión Gas",
+                    "type": "gas",
+                    "responsables": ["BUISEL, Luis María"],
+                    "children": [
+                        { "id": "UTG_1", "name": "Control Técnico", "shortName": "Ctrl. Técnico",
+                            "type": "gas", "responsables": ["AYLLÓN ZELAYA, Javier Alberto"],
+                            "children": [] },
+                        { "id": "UTG_2", "name": "Control Operativo", "shortName": "Ctrl. Operativo",
+                            "type": "gas", "responsables": ["TOLOSA PAZ, Juan Martín"], "children": [] },
+                        { "id": "UTG_3", "name": "Calidad de Gas y Medición", "shortName": "Calidad Gas",
+                            "type": "gas", "responsables": ["LANZA, Lucas Esteban"], "children": [] },
+                        { "id": "UTG_4", "name": "Control de Proyectos y Obras", "shortName": "Proyectos",
+                            "type": "gas", "responsables": ["PADRON, Pablo Javier"], "children": [] },
+                        { "id": "UTG_5", "name": "Información Técnico-Geográfica",
+                            "shortName": "Info Técnica", "type": "gas",
+                            "responsables": ["CORRAL, Sergio Antonio"], "children": [] },
+                        { "id": "UTG_6", "name": "Afectaciones al Dominio y Ambiente",
+                            "shortName": "Afect. Dominio", "type": "gas",
+                            "responsables": ["CANIFFI, Daniel Emilio"], "children": [] },
+                        { "id": "UTG_7", "name": "Coordinación y Planeamiento de Transporte",
+                            "shortName": "Coord. Transporte", "type": "gas",
+                            "responsables": ["MURGA, Javier Alejandro"], "children": [] }
+                    ]
+                }, {
+                    "id": "UGNV",
+                    "name": "UNIDAD GAS NATURAL VEHICULAR",
+                    "shortName": "GNV",
+                    "type": "gas",
+                    "responsables": ["MARTINEZ, María Fernanda"],
+                    "children": [
+                        { "id": "UGNV_1", "name": "Registro de Matrículas Habilitantes",
+                            "shortName": "Matrículas", "type": "gas",
+                            "responsables": ["VIVAS, Fabián Manuel"], "children": [] },
+                        { "id": "UGNV_2", "name": "Control de Gestión Administrativa",
+                            "shortName": "Ctrl. Administrativo", "type": "gas",
+                            "responsables": ["ALVAREZ, Gabriel"], "children": [] },
+                        { "id": "UGNV_3", "name": "Auditorías", "shortName": "Auditorías", "type": "gas",
+                            "responsables": ["CORNAGLIA, Gustavo Martin"], "children": [] },
+                        { "id": "UGNV_4", "name": "Sistemas de Control e Implementación de TI",
+                            "shortName": "Sistemas Control", "type": "gas",
+                            "responsables": ["MARTINEZ, Diego Osvaldo"], "children": [] }
+                    ]
+                }, {
+                    "id": "UDE",
+                    "name": "UNIDAD DESEMPEÑO Y ECONOMÍA",
+                    "shortName": "Desempeño y Economía",
+                    "type": "gas",
+                    "responsables": ["BELLO, Fabián Marcelo"],
+                    "children": [
+                        { "id": "UDE_1", "name": "Economía y Regulación del Transporte",
+                            "shortName": "Econ. Transporte", "type": "gas",
+                            "responsables": ["MONTI HUGHS, Nicolás"], "children": [] },
+                        { "id": "UDE_2", "name": "Economía y Regulación de Distribución",
+                            "shortName": "Econ. Distribución", "type": "gas",
+                            "responsables": ["SANCHEZ, Sebastian"], "children": [] },
+                        { "id": "UDE_3",
+                            "name": "Desempeño de las Licenciatarias, Análisis de Negocio y Estadísticas",
+                            "shortName": "Desempeño Lic.", "type": "gas",
+                            "responsables": ["HASSAN, Alejandro Daniel"], "children": [] },
+                        { "id": "UDE_4",
+                            "name": "Autorizaciones, Zona Fría, Fondo Compensador, Seguros, Impuestos y Activos Esenciales",
+                            "shortName": "Autorizaciones", "type": "gas",
+                            "responsables": ["LOYATO, Anabella Elisa"], "children": [] },
+                        { "id": "UDE_5", "name": "Tarifas Iniciales y Revisiones Tarifarias",
+                            "shortName": "Tarifas", "type": "gas",
+                            "responsables": ["PERDOMO, Mario Javier"], "children": [] }
+                    ]
+                }, {
+                    "id": "UIN",
+                    "name": "UNIDAD INNOVACIÓN Y NORMALIZACIÓN",
+                    "shortName": "Innovación y Normalización",
+                    "type": "gas",
+                    "responsables": ["BRAVO, Graciela Ana"],
+                    "children": [
+                        { "id": "UIN_1", "name": "Innovación", "shortName": "Innovación", "type": "gas",
+                            "responsables": ["BUCCIERI, Ana Carina"], "children": [] },
+                        { "id": "UIN_2", "name": "Transporte y Almacenaje", "shortName": "Transp. y Almac.",
+                            "type": "gas", "responsables": ["GIMENO, Gonzalo Damián"], "children": [] },
+                        { "id": "UIN_3", "name": "Distribución", "shortName": "Distribución", "type": "gas",
+                            "responsables": ["CÁCERES PACHECO, Juan Steve"], "children": [] },
+                        { "id": "UIN_4", "name": "Gas Natural Vehicular", "shortName": "GNV Innov.",
+                            "type": "gas", "responsables": ["ROJTENBERG, Diego Ariel"], "children": [] }
+                    ]
+                }, {
+                    "id": "UCER",
+                    "name": "UNIDAD CONTROL ECONÓMICO REGULATORIO",
+                    "shortName": "Control Económico",
+                    "type": "gas",
+                    "responsables": ["DIAZ, Jorge Guillermo"],
+                    "children": [
+                        { "id": "UCER_1", "name": "Control Económico-Contable",
+                            "shortName": "Ctrl. Económico", "type": "gas",
+                            "responsables": ["ARADO, Sergio Daniel"], "children": [] },
+                        { "id": "UCER_2", "name": "Control Normativo y Calidad de la Información",
+                            "shortName": "Ctrl. Normativo", "type": "gas",
+                            "responsables": ["RUSSO, Nelson Gabriel"], "children": [] },
+                        { "id": "UCER_3", "name": "Servicios de Control y Grandes Usuarios",
+                            "shortName": "Serv. Control", "type": "gas",
+                            "responsables": ["ADOLFO, Diego Roberto"], "children": [] },
+                        { "id": "UCER_4", "name": "Soporte Técnico", "shortName": "Soporte Técnico",
+                            "type": "gas", "responsables": ["BUSSE, Marcelo Adrián"], "children": [] }
+                    ]
+                }, {
+                    "id": "DESP",
+                    "name": "DESPACHO DE GAS",
+                    "shortName": "Despacho Gas",
+                    "type": "gas",
+                    "responsables": ["PEZZULLO, Favio Marcelo"],
+                    "children": [
+                        { "id": "DESP_1", "name": "Administración y Regulación de Despacho",
+                            "shortName": "Adm. Despacho", "type": "gas",
+                            "responsables": ["D'ONOFRIO, Brenda"], "children": [] },
+                        { "id": "DESP_2", "name": "Control de Despacho Operativo",
+                            "shortName": "Ctrl. Despacho", "type": "gas",
+                            "responsables": ["ZENCLUSEN, Claudio"], "children": [] }
+                    ]
+                }, {
+                    "id": "DREG",
+                    "name": "DELEGACIONES REGIONALES",
+                    "shortName": "Delegaciones Regionales",
+                    "type": "gas",
+                    "responsables": ["LAMBAN, Andrés Miguel"],
+                    "children": [
+                        { "id": "DREG_1", "name": "Delegación Rosario", "shortName": "Rosario",
+                            "type": "gas", "responsables": ["TAMAGNO CHIERICO, Alberto A."],
+                            "children": [] },
+                        { "id": "DREG_2", "name": "Delegación Noroeste", "shortName": "Noroeste",
+                            "type": "gas", "responsables": ["MARCUZZI, Alfonso Matías"],
+                        "children": [] },
+                        { "id": "DREG_3", "name": "Delegación La Plata", "shortName": "La Plata",
+                            "type": "gas", "responsables": ["RALLI, Paulo Adrián"], "children": [] },
+                        { "id": "DREG_4", "name": "Delegación Bahía Blanca", "shortName": "Bahía Blanca",
+                            "type": "gas", "responsables": ["ROGUIR, Julio César"], "children": [] },
+                        { "id": "DREG_5", "name": "Delegación Tucumán", "shortName": "Tucumán",
+                            "type": "gas", "responsables": ["GARCÍA, Sergio Ariel"], "children": [] },
+                        { "id": "DREG_6", "name": "Delegación Centro", "shortName": "Centro", "type": "gas",
+                            "responsables": ["ROSA, José Antonio"], "children": [] },
+                        { "id": "DREG_7", "name": "Delegación Cuyo", "shortName": "Cuyo", "type": "gas",
+                            "responsables": ["SOSA, Victor Marcelo"], "children": [] },
+                        { "id": "DREG_8", "name": "Delegación Sur", "shortName": "Sur", "type": "gas",
+                            "responsables": ["QUIROGA, Diego Gabriel"], "children": [] },
+                        { "id": "DREG_9", "name": "Delegación Santa Rosa", "shortName": "Santa Rosa",
+                            "type": "gas", "responsables": ["HOLGADO, Germán Matías"], "children": [] },
+                        { "id": "DREG_10", "name": "Delegación Trelew", "shortName": "Trelew",
+                            "type": "gas", "responsables": ["ASPITTIA, Alexis Eduardo"],
+                        "children": [] },
+                        { "id": "DREG_11", "name": "Delegación Río Grande", "shortName": "Río Grande",
+                            "type": "gas", "responsables": ["ALFARANO, Javier Ignacio"],
+                        "children": [] },
+                        { "id": "DREG_12", "name": "Delegación Bariloche", "shortName": "Bariloche",
+                            "type": "gas", "responsables": ["NEGRETI, Daniela"], "children": [] },
+                        { "id": "DREG_13", "name": "Delegación San Juan", "shortName": "San Juan",
+                            "type": "gas", "responsables": ["(sin responsable asignado)"],
+                        "children": [] },
+                        { "id": "DREG_14", "name": "Delegación Mar del Plata",
+                            "shortName": "Mar del Plata", "type": "gas",
+                            "responsables": ["GUICHÓN, Diego Fernando"], "children": [] },
+                        { "id": "DREG_15", "name": "Delegación Concordia", "shortName": "Concordia",
+                            "type": "gas", "responsables": ["MALLERET, Sebastián"], "children": [] },
+                        { "id": "DREG_16", "name": "Delegación Santa Cruz", "shortName": "Santa Cruz",
+                            "type": "gas", "responsables": ["MARKIC, María Cecilia"], "children": [] }
+                    ]
+                }, {
+                    "id": "UAIUE",
+                    "name": "UNIDAD ATENCIÓN INTEGRAL DE USUARIOS DE ELECTRICIDAD",
+                    "shortName": "Atención Usuarios Elec.",
+                    "type": "electricidad",
+                    "responsables": ["IGLESIAS, Jorge", "NEMIÑA, María Soledad"],
+                    "children": [
+                        { "id": "UAIUE_1", "name": "Mesa de Entradas", "shortName": "Mesa Entradas",
+                            "type": "electricidad",
+                            "responsables": ["CARRERA FLORES, Analía Gisela"], "children": [] },
+                        { "id": "UAIUE_2", "name": "Enlaces con Representantes de la Comunidad",
+                            "shortName": "Enlaces Comunidad", "type": "electricidad",
+                            "responsables": ["RÍOS, Daniel Alberto"], "children": [] },
+                        { "id": "UAIUE_3", "name": "Sector Operativo de Atención de Usuarios",
+                            "shortName": "Atención Usuarios", "type": "electricidad",
+                            "responsables": ["MATA, Omar Jorge", "NEMESIO, María Jimena"],
+                            "children": [
+                                { "id": "UAIUE_3_1", "name": "Atención al Público",
+                                    "shortName": "Atención Público", "type": "electricidad",
+                                    "responsables": ["PINASCO, Ezequiel Darío"], "children": [] },
+                                { "id": "UAIUE_3_2", "name": "Atención Telefónica",
+                                    "shortName": "Atención Tel.", "type": "electricidad",
+                                    "responsables": ["CHAPARRO, Cecilia Cristina"],
+                                "children": [] },
+                                { "id": "UAIUE_3_3", "name": "Oficina Virtual",
+                                    "shortName": "Of. Virtual", "type": "electricidad",
+                                    "responsables": ["RODRIGUEZ SUPERVIELLE, M. Celeste"],
+                                    "children": [] },
+                                { "id": "UAIUE_3_4", "name": "Tarifas Especiales",
+                                    "shortName": "Tarifas Esp.", "type": "electricidad",
+                                    "responsables": ["SCELSO, Lucas"], "children": [] },
+                                { "id": "UAIUE_3_5", "name": "Notificaciones",
+                                    "shortName": "Notificaciones", "type": "electricidad",
+                                    "responsables": ["COOLICAN, María Eugenia"], "children": [] }
+                            ] },
+                        { "id": "UAIUE_4", "name": "Gestión de Reclamos", "shortName": "Reclamos",
+                            "type": "electricidad",
+                            "responsables": ["FERNANDEZ, Cristina Beatriz"], "children": [
+                                { "id": "UAIUE_4_1", "name": "Facturación y Comercial",
+                                    "shortName": "Facturación", "type": "electricidad",
+                                    "responsables": ["ROMÁN, Diego Gonzalo"], "children": [] },
+                                { "id": "UAIUE_4_2", "name": "Técnica y Calidad de Servicio",
+                                    "shortName": "Técnica y Calidad", "type": "electricidad",
+                                    "responsables": ["OVIEDO, Ariel Sebastián"],
+                                "children": [] },
+                                { "id": "UAIUE_4_3",
+                                    "name": "Daños en Artefactos y/o Instalaciones",
+                                    "shortName": "Daños", "type": "electricidad",
+                                    "responsables": ["ALONSO NOVO, Irene"], "children": [] },
+                                { "id": "UAIUE_4_4",
+                                    "name": "Control de Cumplimiento y Administrativo",
+                                    "shortName": "Ctrl. Cumplimiento", "type": "electricidad",
+                                    "responsables": ["MAKINISTIAN, Mara"], "children": [] }
+                            ] }
+                    ]
+                }, {
+                    "id": "UAREE",
+                    "name": "UNIDAD ANÁLISIS REGULATORIO Y ESTUDIOS ESPECIALES",
+                    "shortName": "Análisis Regulatorio",
+                    "type": "electricidad",
+                    "responsables": ["TONNELIER, María Cristina", "BIACH, Marcelo Ángel"],
+                    "children": [
+                        { "id": "UAREE_1",
+                            "name": "Accesos, Ampliaciones y Servidumbres Administrativas de Electroducto",
+                            "shortName": "Accesos y Ampliaciones", "type": "electricidad",
+                            "responsables": ["FURNARI, Aldo Julio"], "children": [] },
+                        { "id": "UAREE_2", "name": "Regulación de Distribución",
+                            "shortName": "Reg. Distribución", "type": "electricidad",
+                            "responsables": ["LOBAIZA, María Lorena"], "children": [] },
+                        { "id": "UAREE_3", "name": "Regulación de Transporte",
+                            "shortName": "Reg. Transporte", "type": "electricidad",
+                            "responsables": ["DÍAZ, Mauricio Miguel"], "children": [] }
+                    ]
+                }, {
+                    "id": "UAANRE",
+                    "name": "UNIDAD APLICACIÓN Y ADMINISTRACIÓN DE NORMAS REGULATORIAS",
+                    "shortName": "Aplicación Normas",
+                    "type": "electricidad",
+                    "responsables": ["JAWORSKI, Gabriela Mariana", "BIBÉ, Diego Marcelo"],
+                    "children": [
+                        { "id": "UAANRE_1",
+                            "name": "Distribución y Comercialización de Energía Eléctrica",
+                            "shortName": "Distribución y Comercialización",
+                            "type": "electricidad",
+                            "responsables": ["ALFANO, María Elisa"], "children": [
+                                { "id": "UAANRE_1_1", "name": "Servicio Técnico",
+                                    "shortName": "Serv. Técnico", "type": "electricidad",
+                                    "responsables": ["PRESERN, Federico"], "children": [] },
+                                { "id": "UAANRE_1_2", "name": "Producto Técnico",
+                                    "shortName": "Producto Técnico", "type": "electricidad",
+                                    "responsables": ["MARCHUETA, Agustín María"],
+                                "children": [] },
+                                { "id": "UAANRE_1_3", "name": "Servicio Comercial",
+                                    "shortName": "Serv. Comercial", "type": "electricidad",
+                                    "responsables": ["MANENTE, Luis Gonzalo",
+                                        "RENZETTI, Marcela Claudia"
+                                    ], "children": [] }
+                            ] },
+                        { "id": "UAANRE_2", "name": "Transporte de Energía Eléctrica",
+                            "shortName": "Transporte", "type": "electricidad",
+                            "responsables": ["GUIJO, Andrés Adrián", "PÉREZ, Fernando Atilio"],
+                            "children": [] },
+                        { "id": "UAANRE_3", "name": "Análisis e Inspección Técnica",
+                            "shortName": "Inspección Técnica", "type": "electricidad",
+                            "responsables": ["FERNANDEZ UGAZIO, Ezequiel"], "children": [
+                                { "id": "UAANRE_3_1", "name": "Inspecciones Zonales Técnicas",
+                                    "shortName": "Inspecciones Zonales",
+                                    "type": "electricidad", "responsables": ["KOPE, Kevin"],
+                                    "children": [] },
+                                { "id": "UAANRE_3_2",
+                                    "name": "Control de Inversiones de Distribución",
+                                    "shortName": "Inversiones Distribución",
+                                    "type": "electricidad",
+                                    "responsables": ["CARRIÓ, Roberto Martín"],
+                                "children": [] },
+                                { "id": "UAANRE_3_3",
+                                    "name": "Control de Inversiones de Transporte",
+                                    "shortName": "Inversiones Transporte",
+                                    "type": "electricidad",
+                                    "responsables": ["RINALDI, Tomás Salvador"],
+                                "children": [] },
+                                { "id": "UAANRE_3_4",
+                                    "name": "Monitoreo de Redes del Servicio Eléctrico",
+                                    "shortName": "Monitoreo Redes", "type": "electricidad",
+                                    "responsables": ["JECKELN, Ernesto Guillermo"],
+                                    "children": [] },
+                                { "id": "UAANRE_3_5",
+                                    "name": "Mejora Continua, Logística y Control de Gestión Interna",
+                                    "shortName": "Mejora Continua", "type": "electricidad",
+                                    "responsables": ["PUGLIESE, Paolo"], "children": [] }
+                            ] }
+                    ]
+                }, {
+                    "id": "USPMA",
+                    "name": "UNIDAD SEGURIDAD PÚBLICA Y MEDIO AMBIENTE",
+                    "shortName": "Seguridad Pública y Ambiente",
+                    "type": "electricidad",
+                    "responsables": ["NOGUES, Gastón"],
+                    "children": [
+                        { "id": "USPMA_1", "name": "Seguridad Pública", "shortName": "Seg. Pública",
+                            "type": "electricidad",
+                            "responsables": ["CAMPAGNOLI, Marcelo Javier"], "children": [] },
+                        { "id": "USPMA_2", "name": "Ambiental", "shortName": "Ambiental",
+                            "type": "electricidad", "responsables": ["HALLA, Andrea Berta"],
+                            "children": [] }
+                    ]
+                }]
+            };
+
+            // ==================== ESTADO ====================
+            const STORAGE_KEY = 'organigrama_enrege_data';
+            let organigramaData = null;
+            let selectedNodeId = null;
+            let editingNodeId = null;
+            let collapsedInMini = new Set();
+
+            // ==================== CARGA DE DATOS ====================
+            function loadData() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    try {
+                        organigramaData = JSON.parse(stored);
+                    } catch (e) {
+                        organigramaData = JSON.parse(JSON.stringify(initialData));
+                    }
+                } else {
+                    organigramaData = JSON.parse(JSON.stringify(initialData));
+                    saveData();
+                }
+            }
+
+            function saveData() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(organigramaData));
+            }
+
+            // ==================== BÚSQUEDA DE NODO ====================
+            function findNodeById(id, node = organigramaData) {
+                if (!node) return null;
+                if (node.id === id) return node;
+                if (node.children) {
+                    for (const child of node.children) {
+                        const found = findNodeById(id, child);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+
+            function findParentNode(id, node = organigramaData) {
+                if (!node || !node.children) return null;
+                for (const child of node.children) {
+                    if (child.id === id) return node;
+                    const found = findParentNode(id, child);
+                    if (found) return found;
+                }
+                return null;
+            }
+
+            // ==================== COLLECT ALL NODES ====================
+            function collectAllNodes(node = organigramaData, result = []) {
+                if (!node) return result;
+                result.push({ id: node.id, name: node.shortName || node.name, type: node.type });
+                if (node.children) {
+                    for (const child of node.children) {
+                        collectAllNodes(child, result);
+                    }
+                }
+                return result;
+            }
+
+            // ==================== POPULATE PARENT SELECT ====================
+            function populateParentSelect() {
+                const select = document.getElementById('nodeParent');
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Seleccionar padre...</option>';
+                const allNodes = collectAllNodes();
+                allNodes.forEach(n => {
+                    if (n.id !== editingNodeId) {
+                        const option = document.createElement('option');
+                        option.value = n.id;
+                        option.textContent = n.name + ' (' + n.type + ')';
+                        if (n.id === currentValue) option.selected = true;
+                        select.appendChild(option);
+                    }
+                });
+                if (!editingNodeId && selectedNodeId && selectedNodeId !== organigramaData.id) {
+                    select.value = selectedNodeId;
+                }
+            }
+
+            // ==================== FORM HANDLING ====================
+            function clearForm() {
+                document.getElementById('nodeName').value = '';
+                document.getElementById('nodeShortName').value = '';
+                document.getElementById('nodeType').value = 'gas';
+                document.getElementById('nodeResponsables').value = '';
+                document.getElementById('editingNodeId').value = '';
+                document.getElementById('nodeParent').value = selectedNodeId || '';
+                document.getElementById('cancelEditBtn').style.display = 'none';
+                document.getElementById('deleteNodeBtn').style.display = 'none';
+                document.getElementById('saveNodeBtn').textContent = '💾 Guardar Nodo';
+                document.getElementById('formTitle').textContent = 'Agregar Nuevo Nodo';
+                editingNodeId = null;
+                populateParentSelect();
+            }
+
+            function loadNodeIntoForm(nodeId) {
+                const node = findNodeById(nodeId);
+                if (!node || node.id === organigramaData.id) {
+                    showToast('No se puede editar el nodo raíz', 'error');
+                    return;
+                }
+                editingNodeId = nodeId;
+                document.getElementById('nodeName').value = node.name || '';
+                document.getElementById('nodeShortName').value = node.shortName || '';
+                document.getElementById('nodeType').value = node.type || 'gas';
+                document.getElementById('nodeResponsables').value = node.responsables ? node.responsables.join(
+                    ', ') : '';
+                document.getElementById('editingNodeId').value = nodeId;
+                document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+                document.getElementById('deleteNodeBtn').style.display = 'inline-flex';
+                document.getElementById('saveNodeBtn').textContent = '✏️ Actualizar Nodo';
+                document.getElementById('formTitle').textContent = 'Editar: ' + (node.shortName || node.name);
+                populateParentSelect();
+                const parent = findParentNode(nodeId);
+                if (parent) {
+                    document.getElementById('nodeParent').value = parent.id;
+                }
+                document.getElementById('sidebar').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function saveNode() {
+                const name = document.getElementById('nodeName').value.trim();
+                const shortName = document.getElementById('nodeShortName').value.trim();
+                const type = document.getElementById('nodeType').value;
+                const responsablesRaw = document.getElementById('nodeResponsables').value.trim();
+                const parentId = document.getElementById('nodeParent').value;
+
+                if (!name) {
+                    showToast('El nombre de la unidad es obligatorio', 'error');
+                    return;
+                }
+                if (!type) {
+                    showToast('El tipo es obligatorio', 'error');
+                    return;
+                }
+
+                const responsables = responsablesRaw ? responsablesRaw.split(',').map(s => s.trim()).filter(
+                    s => s.length > 0) : [];
+
+                if (editingNodeId) {
+                    // Actualizar nodo existente
+                    const node = findNodeById(editingNodeId);
+                    if (!node || node.id === organigramaData.id) return;
+                    node.name = name;
+                    node.shortName = shortName || name.substring(0, 40);
+                    node.type = type;
+                    node.responsables = responsables;
+
+                    // Si cambió el padre
+                    const currentParent = findParentNode(editingNodeId);
+                    if (currentParent && currentParent.id !== parentId && parentId) {
+                        // Remover del padre actual
+                        currentParent.children = currentParent.children.filter(c => c.id !== editingNodeId);
+                        // Agregar al nuevo padre
+                        const newParent = findNodeById(parentId);
+                        if (newParent) {
+                            if (!newParent.children) newParent.children = [];
+                            newParent.children.push(node);
+                        }
+                    } else if (!currentParent && parentId) {
+                        const newParent = findNodeById(parentId);
+                        if (newParent) {
+                            if (!newParent.children) newParent.children = [];
+                            newParent.children.push(node);
+                        }
+                    }
+
+                    saveData();
+                    showToast('✅ Nodo actualizado exitosamente', 'success');
+                } else {
+                    // Crear nuevo nodo
+                    if (!parentId) {
+                        showToast('Debe seleccionar un nodo padre', 'error');
+                        return;
+                    }
+                    const parent = findNodeById(parentId);
+                    if (!parent) {
+                        showToast('Nodo padre no encontrado', 'error');
+                        return;
+                    }
+                    const newId = generateId(name);
+                    const newNode = {
+                        id: newId,
+                        name: name,
+                        shortName: shortName || name.substring(0, 40),
+                        type: type,
+                        responsables: responsables,
+                        children: []
+                    };
+                    if (!parent.children) parent.children = [];
+                    parent.children.push(newNode);
+                    saveData();
+                    showToast('🎉 Nuevo nodo agregado: ' + (shortName || name), 'success');
+                }
+
+                clearForm();
+                selectedNodeId = editingNodeId || parentId || organigramaData.id;
+                editingNodeId = null;
+                refreshAll();
+            }
+
+            function deleteNode() {
+                if (!editingNodeId) return;
+                if (editingNodeId === organigramaData.id) {
+                    showToast('No se puede eliminar el nodo raíz', 'error');
+                    return;
+                }
+                const node = findNodeById(editingNodeId);
+                if (!node) return;
+                const nodeName = node.shortName || node.name;
+                const childCount = node.children ? node.children.length : 0;
+                let confirmMsg = `¿Eliminar "${nodeName}"?`;
+                if (childCount > 0) {
+                    confirmMsg +=
+                        `\n\n⚠️ Este nodo tiene ${childCount} subunidades que también serán eliminadas.`;
+                }
+                showModal('🗑️ Confirmar Eliminación', confirmMsg, [
+                    { text: 'Cancelar', cls: 'btn', action: closeModal },
+                    {
+                        text: 'Eliminar',
+                        cls: 'btn danger',
+                        action: () => {
+                            const parent = findParentNode(editingNodeId);
+                            if (parent && parent.children) {
+                                parent.children = parent.children.filter(c => c.id !== editingNodeId);
+                            }
+                            saveData();
+                            clearForm();
+                            selectedNodeId = parent ? parent.id : organigramaData.id;
+                            editingNodeId = null;
+                            refreshAll();
+                            showToast('🗑️ Nodo eliminado: ' + nodeName, 'info');
+                            closeModal();
+                        }
+                    }
+                ]);
+            }
+
+            function generateId(baseName) {
+                // Generar un ID único basado en el nombre
+                const clean = baseName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-zA-Z0-9]/g, '_').toUpperCase().replace(/_+/g, '_').replace(/^_|_$/g, '');
+                let id = clean.substring(0, 20);
+                // Verificar que no exista
+                let counter = 1;
+                let candidate = id;
+                while (findNodeById(candidate)) {
+                    candidate = id + '_' + counter;
+                    counter++;
+                }
+                return candidate || 'NODO_' + Date.now();
+            }
+
+            // ==================== MINI TREE ====================
+            function renderMiniNode(node, depth = 0) {
+                const container = document.createElement('div');
+                const hasChildren = node.children && node.children.length > 0;
+                const isCollapsed = collapsedInMini.has(node.id);
+                const isSelected = selectedNodeId === node.id;
+                const isEditing = editingNodeId === node.id;
+
+                const row = document.createElement('div');
+                row.className = 'mini-node' + (isSelected ? ' selected' : '') + (isEditing ? ' editing' : '');
+                row.setAttribute('data-id', node.id);
+                row.style.paddingLeft = (10 + depth * 4) + 'px';
+
+                const toggle = document.createElement('span');
+                toggle.className = 'mini-toggle';
+                toggle.textContent = hasChildren ? (isCollapsed ? '▶' : '▼') : '·';
+                toggle.style.visibility = hasChildren ? 'visible' : 'hidden';
+                if (hasChildren) {
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (collapsedInMini.has(node.id)) {
+                            collapsedInMini.delete(node.id);
+                        } else {
+                            collapsedInMini.add(node.id);
+                        }
+                        renderMiniTree();
+                    });
+                }
+                row.appendChild(toggle);
+
+                const dot = document.createElement('span');
+                dot.className = 'dot ' + node.type;
+                row.appendChild(dot);
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = node.shortName || node.name;
+                nameSpan.title = node.name;
+                row.appendChild(nameSpan);
+
+                const tag = document.createElement('span');
+                tag.className = 'tag tag-' + node.type;
+                const typeLabels = { directorio: 'DIR', transversal: 'TRANS', gas: 'GAS', electricidad: 'ELEC' };
+                tag.textContent = typeLabels[node.type] || node.type;
+                row.appendChild(tag);
+
+                row.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectNode(node.id);
+                });
+
+                row.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    if (node.id !== organigramaData.id) {
+                        loadNodeIntoForm(node.id);
+                    }
+                });
+
+                container.appendChild(row);
+
+                if (hasChildren && !isCollapsed) {
+                    const childrenDiv = document.createElement('div');
+                    childrenDiv.className = 'mini-children';
+                    for (const child of node.children) {
+                        childrenDiv.appendChild(renderMiniNode(child, depth + 1));
+                    }
+                    container.appendChild(childrenDiv);
+                }
+
+                return container;
+            }
+
+            function renderMiniTree() {
+                const container = document.getElementById('miniTree');
+                container.innerHTML = '';
+                if (organigramaData) {
+                    container.appendChild(renderMiniNode(organigramaData, 0));
+                }
+                // Si hay un nodo seleccionado que no está expandido, expandir sus ancestros
+                if (selectedNodeId) {
+                    expandAncestorsInMini(selectedNodeId);
+                }
+            }
+
+            function expandAncestorsInMini(nodeId) {
+                let parent = findParentNode(nodeId);
+                while (parent) {
+                    collapsedInMini.delete(parent.id);
+                    parent = findParentNode(parent.id);
+                }
+                // Re-render si se expandió algo
+                if (collapsedInMini.size > 0) {
+                    // Solo re-renderizar si cambió
+                }
+            }
+
+            function selectNode(nodeId) {
+                selectedNodeId = nodeId;
+                if (!editingNodeId) {
+                    document.getElementById('nodeParent').value = nodeId;
+                }
+                renderMiniTree();
+                // Hacer scroll al nodo seleccionado
+                setTimeout(() => {
+                    const el = document.querySelector('.mini-node.selected');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+
+            // ==================== REFRESH ALL ====================
+            function refreshAll() {
+                populateParentSelect();
+                renderMiniTree();
+                if (selectedNodeId && !findNodeById(selectedNodeId)) {
+                    selectedNodeId = organigramaData.id;
+                }
+            }
+
+            // ==================== EXPORT / IMPORT ====================
+            function exportJSON() {
+                const jsonStr = JSON.stringify(organigramaData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'organigrama_enrege.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('📥 JSON exportado correctamente', 'success');
+            }
+
+            function importJSON(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.id || !data.name || !data.type) {
+                            throw new Error('Formato JSON inválido');
+                        }
+                        organigramaData = data;
+                        saveData();
+                        selectedNodeId = organigramaData.id;
+                        editingNodeId = null;
+                        clearForm();
+                        refreshAll();
+                        showToast('📤 Organigrama importado exitosamente', 'success');
+                    } catch (err) {
+                        showToast('❌ Error al importar: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function resetData() {
+                showModal('🔄 Restaurar Datos Originales',
+                    '¿Estás seguro? Se perderán todos los cambios realizados.\n\nEsta acción no se puede deshacer.',
+                    [
+                        { text: 'Cancelar', cls: 'btn', action: closeModal },
+                        {
+                            text: 'Restaurar',
+                            cls: 'btn danger',
+                            action: () => {
+                                organigramaData = JSON.parse(JSON.stringify(initialData));
+                                saveData();
+                                selectedNodeId = organigramaData.id;
+                                editingNodeId = null;
+                                collapsedInMini.clear();
+                                clearForm();
+                                refreshAll();
+                                showToast('🔄 Datos restaurados a la versión original', 'info');
+                                closeModal();
+                            }
+                        }
+                    ]);
+            }
+
+            // ==================== MODAL ====================
+            function showModal(title, message, buttons) {
+                const overlay = document.getElementById('modalOverlay');
+                const content = document.getElementById('modalContent');
+                content.innerHTML = `
+                    <h3>${title}</h3>
+                    <p style="white-space:pre-line;margin-bottom:16px;color:#475569;">${message}</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+                `;
+                const btnContainer = content.querySelector('div');
+                buttons.forEach(b => {
+                    const btn = document.createElement('button');
+                    btn.className = b.cls;
+                    btn.textContent = b.text;
+                    btn.addEventListener('click', b.action);
+                    btnContainer.appendChild(btn);
+                });
+                overlay.style.display = 'flex';
+            }
+
+            function closeModal() {
+                document.getElementById('modalOverlay').style.display = 'none';
+            }
+
+            // ==================== TOAST ====================
+            function showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast ' + type;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // ==================== EVENT LISTENERS ====================
+            document.getElementById('saveNodeBtn').addEventListener('click', saveNode);
+            document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                clearForm();
+                refreshAll();
+                showToast('Edición cancelada', 'info');
+            });
+            document.getElementById('deleteNodeBtn').addEventListener('click', deleteNode);
+            document.getElementById('exportBtn').addEventListener('click', exportJSON);
+            document.getElementById('resetBtn').addEventListener('click', resetData);
+            document.getElementById('importFile').addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    importJSON(this.files[0]);
+                    this.value = '';
+                }
+            });
+            document.getElementById('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            // Teclas rápidas
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (document.getElementById('modalOverlay').style.display === 'flex') {
+                        closeModal();
+                    } else if (editingNodeId) {
+                        clearForm();
+                        refreshAll();
+                        showToast('Edición cancelada', 'info');
+                    }
+                }
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveNode();
+                }
+            });
+
+            // ==================== INICIALIZACIÓN ====================
+            function init() {
+                loadData();
+                if (!organigramaData) {
+                    organigramaData = JSON.parse(JSON.stringify(initialData));
+                    saveData();
+                }
+                selectedNodeId = organigramaData.id;
+                collapsedInMini.add('DREG'); // Colapsar delegaciones por defecto
+                clearForm();
+                refreshAll();
+                showToast('✅ Editor de organigrama listo', 'success');
+                console.log('✏️ Editor ENREGE - Haz doble clic en un nodo para editarlo.');
+                console.log('   Usa Ctrl+S para guardar rápidamente.');
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
