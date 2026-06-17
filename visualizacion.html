@@ -22,13 +22,39 @@
             --color-transversal: #6366f1;
             --color-gas: #f59e0b;
             --color-electricidad: #3b82f6;
+            --header-height: 56px;    /* NUEVO: altura aprox. del header */
+            --toolbar-height: 52px;   /* NUEVO: altura aprox. del toolbar */
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; line-height:1.5; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;           /* NUEVO: ocupar toda la ventana */
+            display: flex;
+            flex-direction: column;  /* NUEVO: apilar verticalmente */
+            overflow: hidden;        /* NUEVO: evitar scroll del body */
+            line-height: 1.5;
+        }
 
-        /* HEADER */
-        .header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
+        /* ========== HEADER ========== */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: sticky;       /* NUEVO: siempre visible */
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+            height: var(--header-height);
+            flex-shrink: 0;         /* NUEVO: no encoger */
+        }
         .header-logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem; color:#1e293b; white-space:nowrap; }
         .header-logo .icon { width:38px; height:38px; border-radius:var(--radius-sm); background:linear-gradient(135deg,#6366f1,#3b82f6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; }
         .search-wrap { position:relative; flex:1; min-width:220px; max-width:480px; }
@@ -41,8 +67,23 @@
         .search-result-item:hover { background:#eef2ff; }
         .search-result-item .match-type { display:inline-block; padding:2px 8px; border-radius:50px; font-size:0.7rem; font-weight:600; text-transform:uppercase; margin-right:6px; }
 
-        /* TOOLBAR */
-        .toolbar { display:flex; gap:8px; flex-wrap:wrap; padding:10px 24px; background:#fff; border-bottom:1px solid var(--border); align-items:center; }
+ 
+        /* ========== TOOLBAR ========== */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px 24px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            position: sticky;               /* NUEVO: siempre visible */
+            top: var(--header-height);      /* NUEVO: justo debajo del header */
+            z-index: 99;                    /* NUEVO: debajo del header pero sobre el contenido */
+            box-shadow: var(--shadow-sm);
+            height: var(--toolbar-height);
+            flex-shrink: 0;
+        }        
         .toolbar .btn { padding:8px 16px; border-radius:50px; border:1.5px solid var(--border); background:#fff; cursor:pointer; font-size:0.8rem; font-weight:600; transition:var(--transition); display:flex; align-items:center; gap:6px; white-space:nowrap; }
         .toolbar .btn:hover { background:#f8fafc; border-color:#cbd5e1; }
         .toolbar .btn.active-filter { background:#6366f1; color:#fff; border-color:#6366f1; }
@@ -54,12 +95,43 @@
         .toolbar .spacer { flex:1; }
         .toolbar .stats { font-size:0.8rem; color:var(--text-secondary); }
 
-        /* MAIN */
-        .main-container { flex:1; display:flex; overflow:auto; }
-        .tree-panel { flex:2; padding:20px 24px; overflow:auto; }
-        .details-panel { width:340px; background:#fff; border-left:1px solid var(--border); box-shadow:var(--shadow-sm); overflow-y:auto; display:none; flex-direction:column; }
+
+        /* ========== MAIN CONTAINER ========== */
+        .main-container {
+            flex: 1;                /* NUEVO: ocupa el espacio restante */
+            display: flex;
+            overflow: hidden;       /* NUEVO: no scroll en el contenedor principal */
+        }     
+        /* Panel del árbol (izquierda) */
+        .tree-panel {
+            flex: 2;                /* NUEVO: ocupa 2/3 */
+            overflow-y: auto;       /* NUEVO: solo este panel hace scroll */
+            padding: 20px 24px;
+        }
+        /* Panel de detalles (derecha) */
+        .details-panel {
+            width: 340px;
+            background: #fff;
+            border-left: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow-y: auto;       /* NUEVO: scroll independiente si el contenido es largo */
+            display: none;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
         .details-panel.active { display:flex; }
-        .details-header { padding:16px 20px; border-bottom:1px solid var(--border); font-weight:700; display:flex; align-items:center; gap:8px; background:#f8fafc; }
+        .details-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            position: sticky;       /* NUEVO: el título se queda arriba dentro del panel */
+            top: 0;
+            z-index: 5;
+        }        
         .details-content { padding:16px 20px; flex:1; }
         .details-person { background:#f8fafc; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; border:1px solid var(--border); }
         .details-person .person-name { font-weight:700; color:#1e293b; margin-bottom:6px; }
