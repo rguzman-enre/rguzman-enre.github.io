@@ -3,510 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organigrama ENREGE - Edición</title>
+    <title>Organigrama ENREGE - Editor</title>
     <style>
         :root {
-            --bg: #f1f5f9;
-            --surface: #ffffff;
-            --surface-alt: #f8fafc;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --radius: 10px;
-            --radius-sm: 6px;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --color-directorio: #1e293b;
-            --color-transversal: #6366f1;
-            --color-gas: #f59e0b;
-            --color-electricidad: #3b82f6;
-            --danger: #ef4444;
-            --success: #10b981;
+            --bg: #f1f5f9; --surface: #ffffff; --surface-alt: #f8fafc;
+            --text: #1e293b; --text-secondary: #64748b; --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --radius: 10px; --radius-sm: 6px;
+            --color-directorio: #1e293b; --color-transversal: #6366f1;
+            --color-gas: #f59e0b; --color-electricidad: #3b82f6;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+        .header { background:#fff; border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .header-logo { font-weight:700; font-size:1.1rem; display:flex; align-items:center; gap:10px; }
+        .btn { padding:8px 16px; border-radius:50px; border:1.5px solid var(--border); background:#fff; cursor:pointer; font-size:0.85rem; font-weight:600; transition:0.2s; display:flex; align-items:center; gap:6px; }
+        .btn:hover { background:#f8fafc; }
+        .btn.primary { background:#6366f1; color:#fff; border-color:#6366f1; }
+        .btn.danger { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
+        .btn.success { background:#10b981; color:#fff; border-color:#10b981; }
+        .main-layout { display:flex; flex:1; overflow:hidden; }
+        .sidebar { width:480px; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; overflow-y:auto; }
+        .sidebar-header { padding:16px 20px; border-bottom:1px solid var(--border); font-weight:700; }
+        .sidebar-content { padding:16px 20px; flex:1; }
+        .preview-panel { flex:1; padding:20px; overflow:auto; }
+        .form-group { margin-bottom:12px; }
+        .form-group label { font-weight:600; font-size:0.8rem; display:block; margin-bottom:4px; color:#475569; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; padding:8px 12px; border:2px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem; }
+        .form-row { display:flex; gap:10px; }
+        .form-row .form-group { flex:1; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Responsables dinámicos */
+        .responsables-list { margin-top:8px; }
+        .responsable-card { background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; margin-bottom:10px; position:relative; }
+        .responsable-card .remove-btn { position:absolute; top:6px; right:8px; background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.1rem; }
+        .responsable-card .field-row { display:flex; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+        .responsable-card .field-row input { flex:1; min-width:100px; }
+        .extra-fields { margin-top:6px; }
+        .extra-field { display:flex; gap:8px; margin-bottom:4px; align-items:center; }
+        .extra-field input { flex:1; }
+        .add-field-btn { font-size:0.75rem; color:#6366f1; cursor:pointer; background:none; border:none; margin-top:4px; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.5;
-        }
-
-        /* ========== HEADER ========== */
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            box-shadow: var(--shadow-sm);
-        }
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #1e293b;
-            white-space: nowrap;
-        }
-        .header-logo .icon {
-            width: 38px;
-            height: 38px;
-            border-radius: var(--radius-sm);
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.3rem;
-        }
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
-            flex-wrap: wrap;
-        }
-        .btn {
-            padding: 10px 18px;
-            border-radius: 50px;
-            border: 1.5px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-            text-decoration: none;
-            color: var(--text);
-        }
-        .btn:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        .btn.primary {
-            background: #6366f1;
-            color: #fff;
-            border-color: #6366f1;
-        }
-        .btn.primary:hover {
-            background: #4f46e5;
-        }
-        .btn.success {
-            background: #10b981;
-            color: #fff;
-            border-color: #10b981;
-        }
-        .btn.success:hover {
-            background: #059669;
-        }
-        .btn.danger {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #dc2626;
-        }
-        .btn.danger:hover {
-            background: #fee2e2;
-        }
-        .btn.outline {
-            background: transparent;
-            border: 2px dashed #cbd5e1;
-        }
-
-        /* ========== LAYOUT ========== */
-        .main-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        .sidebar {
-            width: 420px;
-            min-width: 380px;
-            background: #fff;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            box-shadow: var(--shadow-sm);
-            z-index: 10;
-        }
-        .sidebar-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            font-weight: 700;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: sticky;
-            top: 0;
-            background: #fff;
-            z-index: 5;
-        }
-        .sidebar-content {
-            padding: 16px 20px;
-            flex: 1;
-        }
-        .preview-panel {
-            flex: 1;
-            padding: 20px;
-            overflow: auto;
-            background: #fafbfc;
-        }
-        .preview-title {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 14px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* ========== FORM ========== */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.8rem;
-            margin-bottom: 4px;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            font-family: inherit;
-            transition: var(--transition);
-            background: var(--surface-alt);
-            outline: none;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-            background: #fff;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-        .form-row .form-group {
-            flex: 1;
-        }
-        .form-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
-        .tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .tag-gas {
-            background: #fffbeb;
-            color: #b45309;
-        }
-        .tag-elec {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-        .tag-trans {
-            background: #eef2ff;
-            color: #4f46e5;
-        }
-        .tag-dir {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        /* ========== TREE MINI ========== */
-        .mini-tree {
-            font-size: 0.78rem;
-        }
-        .mini-node {
-            padding: 7px 10px;
-            margin: 3px 0;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1.5px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff;
-            user-select: none;
-        }
-        .mini-node:hover {
-            border-color: #cbd5e1;
-            background: #f8fafc;
-        }
-        .mini-node.selected {
-            border-color: #6366f1 !important;
-            background: #eef2ff !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-        .mini-node .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .mini-node .dot.gas {
-            background: #f59e0b;
-        }
-        .mini-node .dot.electricidad {
-            background: #3b82f6;
-        }
-        .mini-node .dot.transversal {
-            background: #6366f1;
-        }
-        .mini-node .dot.directorio {
-            background: #1e293b;
-        }
-        .mini-node .name {
-            flex: 1;
-            font-weight: 600;
-            color: #334155;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .mini-children {
-            margin-left: 16px;
-            border-left: 2px solid #e2e8f0;
-            padding-left: 8px;
-        }
-        .mini-children.collapsed {
-            display: none;
-        }
-        .mini-toggle {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 1px solid #cbd5e1;
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.55rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: #64748b;
-            transition: var(--transition);
-        }
-        .mini-toggle:hover {
-            background: #e2e8f0;
-        }
-
-        /* ========== TOAST ========== */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            color: #fff;
-            font-weight: 600;
-            font-size: 0.85rem;
-            box-shadow: var(--shadow-lg);
-            animation: slideIn 0.3s ease;
-            max-width: 400px;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .toast.success {
-            background: #10b981;
-        }
-        .toast.error {
-            background: #ef4444;
-        }
-        .toast.info {
-            background: #6366f1;
-        }
-
-        /* ========== MODAL ========== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .modal {
-            background: #fff;
-            border-radius: var(--radius);
-            padding: 24px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: var(--shadow-lg);
-        }
-        .modal h3 {
-            margin-bottom: 16px;
-        }
-        .modal .btn {
-            margin-top: 8px;
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 900px) {
-            .main-layout {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                min-width: 100%;
-                max-height: 50vh;
-            }
-            .preview-panel {
-                max-height: 40vh;
-            }
-        }
+        .mini-tree { font-size:0.78rem; }
+        .mini-node { padding:7px 10px; margin:3px 0; border-radius:var(--radius-sm); cursor:pointer; border:1.5px solid transparent; display:flex; align-items:center; gap:8px; background:#fff; }
+        .mini-node.selected { border-color:#6366f1; background:#eef2ff; }
+        .mini-node .dot { width:8px; height:8px; border-radius:50%; }
+        .tag { padding:2px 8px; border-radius:50px; font-size:0.65rem; font-weight:600; }
+        .toast-container { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+        .toast { padding:12px 20px; border-radius:var(--radius-sm); color:#fff; font-weight:600; font-size:0.85rem; box-shadow:0 10px 15px rgba(0,0,0,0.1); animation:slideIn 0.3s; }
+        @keyframes slideIn { from{transform:translateX(120%);opacity:0;} to{transform:translateX(0);opacity:1;} }
     </style>
 </head>
 <body>
-
-    <!-- HEADER -->
     <header class="header">
-        <div class="header-logo">
-            <div class="icon">✏️</div>
-            <span>Editor de Organigrama - ENREGE</span>
-        </div>
-        <div class="header-actions">
-            <button class="btn outline" id="exportBtn" title="Descargar JSON">📥 Exportar JSON</button>
-            <label class="btn outline" style="cursor:pointer;" title="Importar JSON">📤 Importar JSON
-                <input type="file" id="importFile" accept=".json" style="display:none;">
-            </label>
-            <button class="btn danger" id="resetBtn" title="Restaurar datos originales">🔄 Restaurar</button>
-            <a href="visualizacion.html" class="btn primary" target="_blank">👁️ Ver Organigrama</a>
+        <div class="header-logo">✏️ Editor ENREGE</div>
+        <div class="header-actions" style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn" id="exportBtn">📥 Exportar JSON</button>
+            <label class="btn" style="cursor:pointer;">📤 Importar <input type="file" id="importFile" accept=".json" hidden></label>
+            <button class="btn danger" id="resetBtn">🔄 Restaurar</button>
+            <a href="visualizacion.html" target="_blank" class="btn primary">👁️ Ver Organigrama</a>
         </div>
     </header>
-
-    <!-- MAIN LAYOUT -->
     <div class="main-layout">
-        <!-- SIDEBAR - Formulario -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">📝 <span id="formTitle">Agregar Nuevo Nodo</span></div>
-            <div class="sidebar-content" id="sidebarContent">
-                <div id="formContainer">
-                    <!-- Formulario dinámico -->
-                    <div class="form-group">
-                        <label>Nombre Completo de la Unidad *</label>
-                        <input type="text" id="nodeName" placeholder="Ej: UNIDAD DE EJEMPLO">
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre Corto / Abreviatura</label>
-                        <input type="text" id="nodeShortName" placeholder="Ej: U. Ejemplo">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo *</label>
-                            <select id="nodeType">
-                                <option value="directorio">🏛️ Directorio</option>
-                                <option value="transversal">🔄 Transversal</option>
-                                <option value="gas">🔥 Gas</option>
-                                <option value="electricidad">⚡ Electricidad</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Nodo Padre *</label>
-                            <select id="nodeParent">
-                                <option value="">Seleccionar padre...</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Responsables (separados por coma)</label>
-                        <textarea id="nodeResponsables" placeholder="Ej: PÉREZ, Juan (gas), GÓMEZ, Ana (elec)"></textarea>
-                    </div>
-                    <input type="hidden" id="editingNodeId" value="">
-                    <div class="form-actions">
-                        <button class="btn success" id="saveNodeBtn">💾 Guardar Nodo</button>
-                        <button class="btn" id="cancelEditBtn" style="display:none;">❌ Cancelar Edición</button>
-                        <button class="btn danger" id="deleteNodeBtn" style="display:none;">🗑️ Eliminar Nodo</button>
-                    </div>
-                    <div style="margin-top:12px; padding:10px; background:#fffbeb; border-radius:6px; font-size:0.75rem; color:#92400e;">
-                        ⚠️ <strong>Importante:</strong> Los cambios se guardan automáticamente en tu navegador. Usa "Exportar JSON" para respaldar.
-                    </div>
+        <div class="sidebar">
+            <div class="sidebar-header" id="formTitle">Agregar Nuevo Nodo</div>
+            <div class="sidebar-content">
+                <div class="form-group"><label>Nombre Completo *</label><input type="text" id="nodeName"></div>
+                <div class="form-group"><label>Nombre Corto</label><input type="text" id="nodeShortName"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tipo *</label><select id="nodeType"><option value="directorio">🏛️ Directorio</option><option value="transversal">🔄 Transversal</option><option value="gas">🔥 Gas</option><option value="electricidad">⚡ Electricidad</option></select></div>
+                    <div class="form-group"><label>Nodo Padre *</label><select id="nodeParent"></select></div>
+                </div>
+
+                <!-- SECCIÓN RESPONSABLES -->
+                <div class="form-group" style="margin-top:16px;">
+                    <label>👥 Responsables</label>
+                    <div class="responsables-list" id="responsablesContainer"></div>
+                    <button class="btn" id="addResponsableBtn" style="margin-top:8px;">+ Agregar Responsable</button>
+                </div>
+
+                <input type="hidden" id="editingNodeId" value="">
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button class="btn success" id="saveNodeBtn">💾 Guardar</button>
+                    <button class="btn" id="cancelEditBtn" style="display:none;">❌ Cancelar</button>
+                    <button class="btn danger" id="deleteNodeBtn" style="display:none;">🗑️ Eliminar</button>
                 </div>
             </div>
         </div>
-
-        <!-- PREVIEW PANEL -->
-        <div class="preview-panel" id="previewPanel">
-            <div class="preview-title">🗂️ Vista Previa del Organigrama</div>
+        <div class="preview-panel">
+            <div style="font-weight:700; margin-bottom:12px;">🗂️ Vista previa</div>
             <div class="mini-tree" id="miniTree"></div>
         </div>
     </div>
-
-    <!-- TOAST -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- MODAL oculto para confirmaciones -->
-    <div class="modal-overlay" id="modalOverlay" style="display:none;">
-        <div class="modal" id="modalContent"></div>
-    </div>
 
     <script>
         (function() {
-            // ==================== DATOS INICIALES ====================
             const initialData = {
                 "id": "ENREGE",
                 "name": "ENTE NACIONAL REGULADOR DEL GAS Y LA ELECTRICIDAD (ENREGE)",
@@ -1089,530 +681,262 @@
                 }]
             };
 
-            // ==================== ESTADO ====================
+            
             const STORAGE_KEY = 'organigrama_enrege_data';
             let organigramaData = null;
-            let selectedNodeId = null;
-            let editingNodeId = null;
-            let collapsedInMini = new Set();
+            let selectedNodeId = null, editingNodeId = null, collapsedInMini = new Set();
 
-            // ==================== CARGA DE DATOS ====================
+            function migrateToObjects(node) {
+                if (!node.responsables) node.responsables = [];
+                node.responsables = node.responsables.map(r => {
+                    if (typeof r === 'string') return { nombre: r, telefono: '', ubicacion: '', fechaNacimiento: '', extra: {} };
+                    if (!r.extra) r.extra = {};
+                    return r;
+                });
+                if (node.children) node.children.forEach(migrateToObjects);
+            }
+
             function loadData() {
                 const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored) {
-                    try {
-                        organigramaData = JSON.parse(stored);
-                    } catch (e) {
-                        organigramaData = JSON.parse(JSON.stringify(initialData));
-                    }
-                } else {
-                    organigramaData = JSON.parse(JSON.stringify(initialData));
-                    saveData();
-                }
+                organigramaData = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(initialData));
+                migrateToObjects(organigramaData);
+                saveData();
             }
+            function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(organigramaData)); }
+            function findNodeById(id, node = organigramaData) { /* igual que antes */ if(!node) return null; if(node.id===id) return node; if(node.children) for(let ch of node.children) { const f=findNodeById(id,ch); if(f) return f; } return null; }
+            function findParentNode(id, node = organigramaData) { if(!node||!node.children) return null; for(let ch of node.children) { if(ch.id===id) return node; const f=findParentNode(id,ch); if(f) return f; } return null; }
+            function collectAllNodes(node=organigramaData, res=[]) { if(!node) return res; res.push({id:node.id, name:node.shortName||node.name, type:node.type}); if(node.children) node.children.forEach(ch=>collectAllNodes(ch,res)); return res; }
 
-            function saveData() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(organigramaData));
-            }
-
-            // ==================== BÚSQUEDA DE NODO ====================
-            function findNodeById(id, node = organigramaData) {
-                if (!node) return null;
-                if (node.id === id) return node;
-                if (node.children) {
-                    for (const child of node.children) {
-                        const found = findNodeById(id, child);
-                        if (found) return found;
-                    }
-                }
-                return null;
-            }
-
-            function findParentNode(id, node = organigramaData) {
-                if (!node || !node.children) return null;
-                for (const child of node.children) {
-                    if (child.id === id) return node;
-                    const found = findParentNode(id, child);
-                    if (found) return found;
-                }
-                return null;
-            }
-
-            // ==================== COLLECT ALL NODES ====================
-            function collectAllNodes(node = organigramaData, result = []) {
-                if (!node) return result;
-                result.push({ id: node.id, name: node.name || node.shortName, type: node.type });
-                if (node.children) {
-                    for (const child of node.children) {
-                        collectAllNodes(child, result);
-                    }
-                }
-                return result;
-            }
-
-            // ==================== POPULATE PARENT SELECT ====================
-            function populateParentSelect() {
-                const select = document.getElementById('nodeParent');
-                const currentValue = select.value;
-                select.innerHTML = '<option value="">Seleccionar padre...</option>';
-                const allNodes = collectAllNodes();
-                allNodes.forEach(n => {
-                    if (n.id !== editingNodeId) {
-                        const option = document.createElement('option');
-                        option.value = n.id;
-                        option.textContent = n.name + ' (' + n.type + ')';
-                        if (n.id === currentValue) option.selected = true;
-                        select.appendChild(option);
-                    }
+            // --- Render de responsables en formulario ---
+            function renderResponsablesForm(responsables = []) {
+                const container = document.getElementById('responsablesContainer');
+                container.innerHTML = '';
+                responsables.forEach((p, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'responsable-card';
+                    card.innerHTML = `
+                        <button class="remove-btn" data-idx="${idx}">✕</button>
+                        <div class="field-row">
+                            <input placeholder="Nombre *" value="${p.nombre||''}" data-field="nombre">
+                        </div>
+                        <div class="field-row">
+                            <input placeholder="Teléfono" value="${p.telefono||''}" data-field="telefono">
+                            <input placeholder="Ubicación" value="${p.ubicacion||''}" data-field="ubicacion">
+                            <input placeholder="Fecha nac. (YYYY-MM-DD)" value="${p.fechaNacimiento||''}" data-field="fechaNacimiento">
+                        </div>
+                        <div class="extra-fields" data-idx="${idx}"></div>
+                        <button class="add-field-btn">+ Agregar campo personalizado</button>
+                    `;
+                    const extraContainer = card.querySelector('.extra-fields');
+                    const renderExtra = () => {
+                        extraContainer.innerHTML = '';
+                        if (p.extra) {
+                            Object.entries(p.extra).forEach(([key, val]) => {
+                                const row = document.createElement('div');
+                                row.className = 'extra-field';
+                                row.innerHTML = `<input placeholder="Clave" value="${key}"><input placeholder="Valor" value="${val}"><button class="remove-btn" style="position:static; font-size:0.9rem;">✕</button>`;
+                                row.querySelector('button').addEventListener('click', () => {
+                                    delete p.extra[key];
+                                    renderExtra();
+                                });
+                                row.querySelectorAll('input')[0].addEventListener('input', (e) => {
+                                    const newKey = e.target.value.trim();
+                                    const oldVal = p.extra[key];
+                                    delete p.extra[key];
+                                    if (newKey) p.extra[newKey] = oldVal;
+                                    renderExtra();
+                                });
+                                row.querySelectorAll('input')[1].addEventListener('input', (e) => {
+                                    p.extra[key] = e.target.value;
+                                });
+                                extraContainer.appendChild(row);
+                            });
+                        }
+                    };
+                    renderExtra();
+                    card.querySelector('.add-field-btn').addEventListener('click', () => {
+                        if (!p.extra) p.extra = {};
+                        let newKey = 'campo' + (Object.keys(p.extra).length+1);
+                        while (p.extra[newKey]) newKey += '_';
+                        p.extra[newKey] = '';
+                        renderExtra();
+                    });
+                    card.querySelector('.remove-btn').addEventListener('click', () => {
+                        responsables.splice(idx, 1);
+                        renderResponsablesForm(responsables);
+                    });
+                    card.querySelectorAll('input[data-field]').forEach(inp => {
+                        inp.addEventListener('input', (e) => {
+                            p[e.target.dataset.field] = e.target.value;
+                        });
+                    });
+                    container.appendChild(card);
                 });
-                if (!editingNodeId && selectedNodeId && selectedNodeId !== organigramaData.id) {
-                    select.value = selectedNodeId;
-                }
             }
 
-            // ==================== FORM HANDLING ====================
+            function getResponsablesFromForm() {
+                const responsables = [];
+                document.querySelectorAll('.responsable-card').forEach(card => {
+                    const nombre = card.querySelector('input[data-field="nombre"]')?.value.trim();
+                    if (!nombre) return;
+                    const telefono = card.querySelector('input[data-field="telefono"]')?.value.trim() || '';
+                    const ubicacion = card.querySelector('input[data-field="ubicacion"]')?.value.trim() || '';
+                    const fechaNacimiento = card.querySelector('input[data-field="fechaNacimiento"]')?.value.trim() || '';
+                    const extra = {};
+                    card.querySelectorAll('.extra-field').forEach(row => {
+                        const keyInput = row.querySelectorAll('input')[0];
+                        const valInput = row.querySelectorAll('input')[1];
+                        if (keyInput && valInput && keyInput.value.trim()) extra[keyInput.value.trim()] = valInput.value.trim();
+                    });
+                    responsables.push({ nombre, telefono, ubicacion, fechaNacimiento, extra });
+                });
+                return responsables;
+            }
+
             function clearForm() {
                 document.getElementById('nodeName').value = '';
                 document.getElementById('nodeShortName').value = '';
                 document.getElementById('nodeType').value = 'gas';
-                document.getElementById('nodeResponsables').value = '';
                 document.getElementById('editingNodeId').value = '';
                 document.getElementById('nodeParent').value = selectedNodeId || '';
                 document.getElementById('cancelEditBtn').style.display = 'none';
                 document.getElementById('deleteNodeBtn').style.display = 'none';
-                document.getElementById('saveNodeBtn').textContent = '💾 Guardar Nodo';
+                document.getElementById('saveNodeBtn').textContent = '💾 Guardar';
                 document.getElementById('formTitle').textContent = 'Agregar Nuevo Nodo';
                 editingNodeId = null;
+                renderResponsablesForm([]);
                 populateParentSelect();
             }
 
             function loadNodeIntoForm(nodeId) {
                 const node = findNodeById(nodeId);
-                if (!node || node.id === organigramaData.id) {
-                    showToast('No se puede editar el nodo raíz', 'error');
-                    return;
-                }
+                if (!node || node.id === organigramaData.id) return showToast('No se puede editar el nodo raíz','error');
                 editingNodeId = nodeId;
                 document.getElementById('nodeName').value = node.name || '';
                 document.getElementById('nodeShortName').value = node.shortName || '';
-                document.getElementById('nodeType').value = node.type || 'gas';
-                document.getElementById('nodeResponsables').value = node.responsables ? node.responsables.join(
-                    ', ') : '';
+                document.getElementById('nodeType').value = node.type;
                 document.getElementById('editingNodeId').value = nodeId;
                 document.getElementById('cancelEditBtn').style.display = 'inline-flex';
                 document.getElementById('deleteNodeBtn').style.display = 'inline-flex';
-                document.getElementById('saveNodeBtn').textContent = '✏️ Actualizar Nodo';
-                document.getElementById('formTitle').textContent = 'Editar: ' + (node.name || node.shortName);
+                document.getElementById('saveNodeBtn').textContent = '✏️ Actualizar';
+                document.getElementById('formTitle').textContent = 'Editar: ' + (node.shortName||node.name);
+                renderResponsablesForm(node.responsables || []);
                 populateParentSelect();
                 const parent = findParentNode(nodeId);
-                if (parent) {
-                    document.getElementById('nodeParent').value = parent.id;
-                }
-                document.getElementById('sidebar').scrollIntoView({ behavior: 'smooth' });
+                if (parent) document.getElementById('nodeParent').value = parent.id;
+            }
+
+            function populateParentSelect() {
+                const sel = document.getElementById('nodeParent');
+                const current = sel.value;
+                sel.innerHTML = '<option value="">Seleccionar padre...</option>';
+                collectAllNodes().forEach(n => { if (n.id !== editingNodeId) { const opt = document.createElement('option'); opt.value=n.id; opt.textContent=n.name+' ('+n.type+')'; if(n.id===current) opt.selected=true; sel.appendChild(opt); } });
             }
 
             function saveNode() {
                 const name = document.getElementById('nodeName').value.trim();
+                if (!name) return showToast('Nombre obligatorio','error');
                 const shortName = document.getElementById('nodeShortName').value.trim();
                 const type = document.getElementById('nodeType').value;
-                const responsablesRaw = document.getElementById('nodeResponsables').value.trim();
                 const parentId = document.getElementById('nodeParent').value;
-
-                if (!name) {
-                    showToast('El nombre de la unidad es obligatorio', 'error');
-                    return;
-                }
-                if (!type) {
-                    showToast('El tipo es obligatorio', 'error');
-                    return;
-                }
-
-                const responsables = responsablesRaw ? responsablesRaw.split(',').map(s => s.trim()).filter(
-                    s => s.length > 0) : [];
+                const responsables = getResponsablesFromForm();
 
                 if (editingNodeId) {
-                    // Actualizar nodo existente
                     const node = findNodeById(editingNodeId);
-                    if (!node || node.id === organigramaData.id) return;
-                    node.name = name;
-                    node.shortName = shortName || name.substring(0, 40);
-                    node.type = type;
+                    if (!node || node.id===organigramaData.id) return;
+                    node.name = name; node.shortName = shortName || name.substring(0,40); node.type = type;
                     node.responsables = responsables;
-
-                    // Si cambió el padre
-                    const currentParent = findParentNode(editingNodeId);
-                    if (currentParent && currentParent.id !== parentId && parentId) {
-                        // Remover del padre actual
-                        currentParent.children = currentParent.children.filter(c => c.id !== editingNodeId);
-                        // Agregar al nuevo padre
+                    const curParent = findParentNode(editingNodeId);
+                    if (curParent && curParent.id !== parentId && parentId) {
+                        curParent.children = curParent.children.filter(c => c.id !== editingNodeId);
                         const newParent = findNodeById(parentId);
-                        if (newParent) {
-                            if (!newParent.children) newParent.children = [];
-                            newParent.children.push(node);
-                        }
-                    } else if (!currentParent && parentId) {
+                        if (newParent) { if(!newParent.children) newParent.children=[]; newParent.children.push(node); }
+                    } else if (!curParent && parentId) {
                         const newParent = findNodeById(parentId);
-                        if (newParent) {
-                            if (!newParent.children) newParent.children = [];
-                            newParent.children.push(node);
-                        }
+                        if (newParent) { if(!newParent.children) newParent.children=[]; newParent.children.push(node); }
                     }
-
-                    saveData();
-                    showToast('✅ Nodo actualizado exitosamente', 'success');
                 } else {
-                    // Crear nuevo nodo
-                    if (!parentId) {
-                        showToast('Debe seleccionar un nodo padre', 'error');
-                        return;
-                    }
+                    if (!parentId) return showToast('Seleccione un padre','error');
                     const parent = findNodeById(parentId);
-                    if (!parent) {
-                        showToast('Nodo padre no encontrado', 'error');
-                        return;
-                    }
+                    if (!parent) return showToast('Padre no encontrado','error');
                     const newId = generateId(name);
-                    const newNode = {
-                        id: newId,
-                        name: name,
-                        shortName: shortName || name.substring(0, 40),
-                        type: type,
-                        responsables: responsables,
-                        children: []
-                    };
+                    const newNode = { id: newId, name, shortName: shortName || name.substring(0,40), type, responsables, children:[] };
                     if (!parent.children) parent.children = [];
                     parent.children.push(newNode);
-                    saveData();
-                    showToast('🎉 Nuevo nodo agregado: ' + (shortName || name), 'success');
                 }
-
+                saveData();
                 clearForm();
                 selectedNodeId = editingNodeId || parentId || organigramaData.id;
                 editingNodeId = null;
                 refreshAll();
+                showToast('✅ Guardado','success');
             }
 
             function deleteNode() {
-                if (!editingNodeId) return;
-                if (editingNodeId === organigramaData.id) {
-                    showToast('No se puede eliminar el nodo raíz', 'error');
-                    return;
-                }
+                if (!editingNodeId || editingNodeId===organigramaData.id) return;
                 const node = findNodeById(editingNodeId);
-                if (!node) return;
-                const nodeName = node.name || node.shortName;
-                const childCount = node.children ? node.children.length : 0;
-                let confirmMsg = `¿Eliminar "${nodeName}"?`;
-                if (childCount > 0) {
-                    confirmMsg +=
-                        `\n\n⚠️ Este nodo tiene ${childCount} subunidades que también serán eliminadas.`;
+                if (confirm(`¿Eliminar "${node.shortName||node.name}"?`)) {
+                    const parent = findParentNode(editingNodeId);
+                    if (parent) parent.children = parent.children.filter(c => c.id !== editingNodeId);
+                    saveData(); clearForm(); selectedNodeId=parent?parent.id:organigramaData.id; editingNodeId=null; refreshAll(); showToast('Eliminado','info');
                 }
-                showModal('🗑️ Confirmar Eliminación', confirmMsg, [
-                    { text: 'Cancelar', cls: 'btn', action: closeModal },
-                    {
-                        text: 'Eliminar',
-                        cls: 'btn danger',
-                        action: () => {
-                            const parent = findParentNode(editingNodeId);
-                            if (parent && parent.children) {
-                                parent.children = parent.children.filter(c => c.id !== editingNodeId);
-                            }
-                            saveData();
-                            clearForm();
-                            selectedNodeId = parent ? parent.id : organigramaData.id;
-                            editingNodeId = null;
-                            refreshAll();
-                            showToast('🗑️ Nodo eliminado: ' + nodeName, 'info');
-                            closeModal();
-                        }
-                    }
-                ]);
             }
 
-            function generateId(baseName) {
-                // Generar un ID único basado en el nombre
-                const clean = baseName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-zA-Z0-9]/g, '_').toUpperCase().replace(/_+/g, '_').replace(/^_|_$/g, '');
-                let id = clean.substring(0, 20);
-                // Verificar que no exista
-                let counter = 1;
-                let candidate = id;
-                while (findNodeById(candidate)) {
-                    candidate = id + '_' + counter;
-                    counter++;
-                }
-                return candidate || 'NODO_' + Date.now();
-            }
-
-            // ==================== MINI TREE ====================
-            function renderMiniNode(node, depth = 0) {
-                const container = document.createElement('div');
-                const hasChildren = node.children && node.children.length > 0;
-                const isCollapsed = collapsedInMini.has(node.id);
-                const isSelected = selectedNodeId === node.id;
-                const isEditing = editingNodeId === node.id;
-
-                const row = document.createElement('div');
-                row.className = 'mini-node' + (isSelected ? ' selected' : '') + (isEditing ? ' editing' : '');
-                row.setAttribute('data-id', node.id);
-                row.style.paddingLeft = (10 + depth * 4) + 'px';
-
-                const toggle = document.createElement('span');
-                toggle.className = 'mini-toggle';
-                toggle.textContent = hasChildren ? (isCollapsed ? '▶' : '▼') : '·';
-                toggle.style.visibility = hasChildren ? 'visible' : 'hidden';
-                if (hasChildren) {
-                    toggle.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (collapsedInMini.has(node.id)) {
-                            collapsedInMini.delete(node.id);
-                        } else {
-                            collapsedInMini.add(node.id);
-                        }
-                        renderMiniTree();
-                    });
-                }
-                row.appendChild(toggle);
-
-                const dot = document.createElement('span');
-                dot.className = 'dot ' + node.type;
-                row.appendChild(dot);
-
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'name';
-                nameSpan.textContent = node.name || node.shortName;
-                nameSpan.title = node.name;
-                row.appendChild(nameSpan);
-
-                const tag = document.createElement('span');
-                tag.className = 'tag tag-' + node.type;
-                const typeLabels = { directorio: 'DIR', transversal: 'TRANS', gas: 'GAS', electricidad: 'ELEC' };
-                tag.textContent = typeLabels[node.type] || node.type;
-                row.appendChild(tag);
-
-                row.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    selectNode(node.id);
-                });
-
-                row.addEventListener('dblclick', (e) => {
-                    e.stopPropagation();
-                    if (node.id !== organigramaData.id) {
-                        loadNodeIntoForm(node.id);
-                    }
-                });
-
-                container.appendChild(row);
-
-                if (hasChildren && !isCollapsed) {
-                    const childrenDiv = document.createElement('div');
-                    childrenDiv.className = 'mini-children';
-                    for (const child of node.children) {
-                        childrenDiv.appendChild(renderMiniNode(child, depth + 1));
-                    }
-                    container.appendChild(childrenDiv);
-                }
-
-                return container;
+            function generateId(name) {
+                let id = name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]/g,'_').toUpperCase().replace(/_+/g,'_').substring(0,20);
+                let counter=1, candidate=id; while(findNodeById(candidate)) candidate = id+'_'+counter++;
+                return candidate || 'NODO_'+Date.now();
             }
 
             function renderMiniTree() {
                 const container = document.getElementById('miniTree');
                 container.innerHTML = '';
-                if (organigramaData) {
-                    container.appendChild(renderMiniNode(organigramaData, 0));
-                }
-                // Si hay un nodo seleccionado que no está expandido, expandir sus ancestros
-                if (selectedNodeId) {
-                    expandAncestorsInMini(selectedNodeId);
-                }
-            }
-
-            function expandAncestorsInMini(nodeId) {
-                let parent = findParentNode(nodeId);
-                while (parent) {
-                    collapsedInMini.delete(parent.id);
-                    parent = findParentNode(parent.id);
-                }
-                // Re-render si se expandió algo
-                if (collapsedInMini.size > 0) {
-                    // Solo re-renderizar si cambió
-                }
-            }
-
-            function selectNode(nodeId) {
-                selectedNodeId = nodeId;
-                if (!editingNodeId) {
-                    document.getElementById('nodeParent').value = nodeId;
-                }
-                renderMiniTree();
-                // Hacer scroll al nodo seleccionado
-                setTimeout(() => {
-                    const el = document.querySelector('.mini-node.selected');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-            }
-
-            // ==================== REFRESH ALL ====================
-            function refreshAll() {
-                populateParentSelect();
-                renderMiniTree();
-                if (selectedNodeId && !findNodeById(selectedNodeId)) {
-                    selectedNodeId = organigramaData.id;
-                }
-            }
-
-            // ==================== EXPORT / IMPORT ====================
-            function exportJSON() {
-                const jsonStr = JSON.stringify(organigramaData, null, 2);
-                const blob = new Blob([jsonStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'organigrama_enrege.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('📥 JSON exportado correctamente', 'success');
-            }
-
-            function importJSON(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (!data.id || !data.name || !data.type) {
-                            throw new Error('Formato JSON inválido');
-                        }
-                        organigramaData = data;
-                        saveData();
-                        selectedNodeId = organigramaData.id;
-                        editingNodeId = null;
-                        clearForm();
-                        refreshAll();
-                        showToast('📤 Organigrama importado exitosamente', 'success');
-                    } catch (err) {
-                        showToast('❌ Error al importar: ' + err.message, 'error');
+                function render(node, depth=0) {
+                    const div = document.createElement('div');
+                    const row = document.createElement('div');
+                    row.className = 'mini-node' + (selectedNodeId===node.id?' selected':'');
+                    row.style.paddingLeft = (10+depth*4)+'px';
+                    row.innerHTML = `<span class="mini-toggle">${node.children?.length?(collapsedInMini.has(node.id)?'▶':'▼'):'·'}</span><span class="dot ${node.type}"></span><span class="name">${node.shortName||node.name}</span><span class="tag tag-${node.type}">${({directorio:'DIR',transversal:'TRANS',gas:'GAS',electricidad:'ELEC'})[node.type]}</span>`;
+                    row.addEventListener('click', (e) => { if(e.target.tagName!=='SPAN'||!e.target.classList.contains('mini-toggle')){ selectNode(node.id); } });
+                    row.querySelector('.mini-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); collapsedInMini.has(node.id)?collapsedInMini.delete(node.id):collapsedInMini.add(node.id); renderMiniTree(); });
+                    row.addEventListener('dblclick', () => { if(node.id!==organigramaData.id) loadNodeIntoForm(node.id); });
+                    div.appendChild(row);
+                    if (node.children?.length && !collapsedInMini.has(node.id)) {
+                        const childrenDiv = document.createElement('div'); childrenDiv.className='mini-children';
+                        node.children.forEach(ch => childrenDiv.appendChild(render(ch, depth+1)));
+                        div.appendChild(childrenDiv);
                     }
-                };
-                reader.readAsText(file);
+                    return div;
+                }
+                container.appendChild(render(organigramaData,0));
             }
 
-            function resetData() {
-                showModal('🔄 Restaurar Datos Originales',
-                    '¿Estás seguro? Se perderán todos los cambios realizados.\n\nEsta acción no se puede deshacer.',
-                    [
-                        { text: 'Cancelar', cls: 'btn', action: closeModal },
-                        {
-                            text: 'Restaurar',
-                            cls: 'btn danger',
-                            action: () => {
-                                organigramaData = JSON.parse(JSON.stringify(initialData));
-                                saveData();
-                                selectedNodeId = organigramaData.id;
-                                editingNodeId = null;
-                                collapsedInMini.clear();
-                                clearForm();
-                                refreshAll();
-                                showToast('🔄 Datos restaurados a la versión original', 'info');
-                                closeModal();
-                            }
-                        }
-                    ]);
-            }
+            function selectNode(id) { selectedNodeId = id; if(!editingNodeId) document.getElementById('nodeParent').value = id; renderMiniTree(); }
+            function refreshAll() { populateParentSelect(); renderMiniTree(); }
+            function showToast(msg,type='info') { const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className='toast '+type; t.textContent=msg; c.appendChild(t); setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(),300); },2500); }
+            function exportJSON() { const blob = new Blob([JSON.stringify(organigramaData,null,2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='organigrama_enrege.json'; a.click(); showToast('Exportado','success'); }
+            function importJSON(file) { const reader=new FileReader(); reader.onload= e=>{ try{ organigramaData=JSON.parse(e.target.result); migrateToObjects(organigramaData); saveData(); selectedNodeId=organigramaData.id; clearForm(); refreshAll(); showToast('Importado','success'); }catch(err){ showToast('Error: '+err.message,'error'); } }; reader.readAsText(file); }
+            function resetData() { if(confirm('¿Restaurar datos originales?')) { organigramaData=JSON.parse(JSON.stringify(initialData)); migrateToObjects(organigramaData); saveData(); selectedNodeId=organigramaData.id; clearForm(); refreshAll(); showToast('Restaurado','info'); } }
 
-            // ==================== MODAL ====================
-            function showModal(title, message, buttons) {
-                const overlay = document.getElementById('modalOverlay');
-                const content = document.getElementById('modalContent');
-                content.innerHTML = `
-                    <h3>${title}</h3>
-                    <p style="white-space:pre-line;margin-bottom:16px;color:#475569;">${message}</p>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;"></div>
-                `;
-                const btnContainer = content.querySelector('div');
-                buttons.forEach(b => {
-                    const btn = document.createElement('button');
-                    btn.className = b.cls;
-                    btn.textContent = b.text;
-                    btn.addEventListener('click', b.action);
-                    btnContainer.appendChild(btn);
-                });
-                overlay.style.display = 'flex';
-            }
-
-            function closeModal() {
-                document.getElementById('modalOverlay').style.display = 'none';
-            }
-
-            // ==================== TOAST ====================
-            function showToast(message, type = 'info') {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'toast ' + type;
-                toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-
-            // ==================== EVENT LISTENERS ====================
             document.getElementById('saveNodeBtn').addEventListener('click', saveNode);
-            document.getElementById('cancelEditBtn').addEventListener('click', () => {
-                clearForm();
-                refreshAll();
-                showToast('Edición cancelada', 'info');
-            });
+            document.getElementById('cancelEditBtn').addEventListener('click', ()=>{ clearForm(); refreshAll(); });
             document.getElementById('deleteNodeBtn').addEventListener('click', deleteNode);
+            document.getElementById('addResponsableBtn').addEventListener('click', ()=>{
+                const current = getResponsablesFromForm();
+                current.push({ nombre:'', telefono:'', ubicacion:'', fechaNacimiento:'', extra:{} });
+                renderResponsablesForm(current);
+            });
             document.getElementById('exportBtn').addEventListener('click', exportJSON);
+            document.getElementById('importFile').addEventListener('change', function(){ if(this.files[0]) importJSON(this.files[0]); this.value=''; });
             document.getElementById('resetBtn').addEventListener('click', resetData);
-            document.getElementById('importFile').addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    importJSON(this.files[0]);
-                    this.value = '';
-                }
-            });
-            document.getElementById('modalOverlay').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
 
-            // Teclas rápidas
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (document.getElementById('modalOverlay').style.display === 'flex') {
-                        closeModal();
-                    } else if (editingNodeId) {
-                        clearForm();
-                        refreshAll();
-                        showToast('Edición cancelada', 'info');
-                    }
-                }
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    saveNode();
-                }
-            });
-
-            // ==================== INICIALIZACIÓN ====================
             function init() {
                 loadData();
-                if (!organigramaData) {
-                    organigramaData = JSON.parse(JSON.stringify(initialData));
-                    saveData();
-                }
                 selectedNodeId = organigramaData.id;
-                collapsedInMini.add('DREG'); // Colapsar delegaciones por defecto
+                collapsedInMini.add('DREG');
                 clearForm();
                 refreshAll();
-                showToast('✅ Editor de organigrama listo', 'success');
-                console.log('✏️ Editor ENREGE - Haz doble clic en un nodo para editarlo.');
-                console.log('   Usa Ctrl+S para guardar rápidamente.');
             }
-
             init();
         })();
     </script>
