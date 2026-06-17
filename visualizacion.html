@@ -12,494 +12,98 @@
             --text: #1e293b;
             --text-secondary: #64748b;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
             --radius: 10px;
             --radius-sm: 6px;
             --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
             --color-directorio: #1e293b;
             --color-transversal: #6366f1;
             --color-gas: #f59e0b;
             --color-electricidad: #3b82f6;
-
-            --color-directorio-light: #e2e8f0;
-            --color-transversal-light: #eef2ff;
-            --color-gas-light: #fffbeb;
-            --color-electricidad-light: #eff6ff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; line-height:1.5; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.5;
-        }
+        /* HEADER */
+        .header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-sm); }
+        .header-logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem; color:#1e293b; white-space:nowrap; }
+        .header-logo .icon { width:38px; height:38px; border-radius:var(--radius-sm); background:linear-gradient(135deg,#6366f1,#3b82f6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; }
+        .search-wrap { position:relative; flex:1; min-width:220px; max-width:480px; }
+        .search-wrap input { width:100%; padding:10px 14px 10px 40px; border:2px solid var(--border); border-radius:50px; font-size:0.9rem; background:var(--surface-alt); transition:var(--transition); outline:none; }
+        .search-wrap input:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.1); background:#fff; }
+        .search-wrap .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8; pointer-events:none; font-size:1rem; }
+        .search-results { position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--border); border-radius:var(--radius-sm); box-shadow:var(--shadow-lg); max-height:300px; overflow-y:auto; z-index:200; display:none; margin-top:4px; }
+        .search-results.active { display:block; }
+        .search-result-item { padding:10px 14px; cursor:pointer; border-bottom:1px solid var(--border); transition:var(--transition); font-size:0.85rem; }
+        .search-result-item:hover { background:#eef2ff; }
+        .search-result-item .match-type { display:inline-block; padding:2px 8px; border-radius:50px; font-size:0.7rem; font-weight:600; text-transform:uppercase; margin-right:6px; }
 
-        /* ========== HEADER ========== */
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #1e293b;
-            white-space: nowrap;
-        }
-        .header-logo .icon {
-            width: 38px;
-            height: 38px;
-            border-radius: var(--radius-sm);
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.3rem;
-        }
-        .search-wrap {
-            position: relative;
-            flex: 1;
-            min-width: 220px;
-            max-width: 480px;
-        }
-        .search-wrap input {
-            width: 100%;
-            padding: 10px 14px 10px 40px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            background: var(--surface-alt);
-            transition: var(--transition);
-            outline: none;
-        }
-        .search-wrap input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-            background: #fff;
-        }
-        .search-wrap .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            pointer-events: none;
-            font-size: 1rem;
-        }
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 200;
-            display: none;
-            margin-top: 4px;
-        }
-        .search-results.active {
-            display: block;
-        }
-        .search-result-item {
-            padding: 10px 14px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            transition: var(--transition);
-            font-size: 0.85rem;
-        }
-        .search-result-item:hover {
-            background: #eef2ff;
-        }
-        .search-result-item .match-type {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-right: 6px;
-        }
+        /* TOOLBAR */
+        .toolbar { display:flex; gap:8px; flex-wrap:wrap; padding:10px 24px; background:#fff; border-bottom:1px solid var(--border); align-items:center; }
+        .toolbar .btn { padding:8px 16px; border-radius:50px; border:1.5px solid var(--border); background:#fff; cursor:pointer; font-size:0.8rem; font-weight:600; transition:var(--transition); display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .toolbar .btn:hover { background:#f8fafc; border-color:#cbd5e1; }
+        .toolbar .btn.active-filter { background:#6366f1; color:#fff; border-color:#6366f1; }
+        .toolbar .btn.filter-gas.active-filter { background:#f59e0b; border-color:#f59e0b; }
+        .toolbar .btn.filter-elec.active-filter { background:#3b82f6; border-color:#3b82f6; }
+        .toolbar .btn.filter-transversal.active-filter { background:#6366f1; border-color:#6366f1; }
+        .toolbar .btn.filter-directorio.active-filter { background:#1e293b; border-color:#1e293b; }
+        .toolbar .btn.danger { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
+        .toolbar .spacer { flex:1; }
+        .toolbar .stats { font-size:0.8rem; color:var(--text-secondary); }
 
-        /* ========== TOOLBAR ========== */
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 10px 24px;
-            background: #fff;
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-        }
-        .toolbar .btn {
-            padding: 8px 16px;
-            border-radius: 50px;
-            border: 1.5px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-        .toolbar .btn:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        .toolbar .btn.active-filter {
-            background: #6366f1;
-            color: #fff;
-            border-color: #6366f1;
-        }
-        .toolbar .btn.filter-gas.active-filter {
-            background: #f59e0b;
-            border-color: #f59e0b;
-        }
-        .toolbar .btn.filter-elec.active-filter {
-            background: #3b82f6;
-            border-color: #3b82f6;
-        }
-        .toolbar .btn.filter-transversal.active-filter {
-            background: #6366f1;
-            border-color: #6366f1;
-        }
-        .toolbar .btn.filter-directorio.active-filter {
-            background: #1e293b;
-            border-color: #1e293b;
-        }
-        .toolbar .btn.danger {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #dc2626;
-        }
-        .toolbar .btn.danger:hover {
-            background: #fee2e2;
-        }
-        .toolbar .spacer {
-            flex: 1;
-        }
-        .toolbar .stats {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .toolbar .stats span {
-            font-weight: 700;
-            color: var(--text);
-        }
+        /* MAIN */
+        .main-container { flex:1; display:flex; overflow:auto; }
+        .tree-panel { flex:2; padding:20px 24px; overflow:auto; }
+        .details-panel { width:340px; background:#fff; border-left:1px solid var(--border); box-shadow:var(--shadow-sm); overflow-y:auto; display:none; flex-direction:column; }
+        .details-panel.active { display:flex; }
+        .details-header { padding:16px 20px; border-bottom:1px solid var(--border); font-weight:700; display:flex; align-items:center; gap:8px; background:#f8fafc; }
+        .details-content { padding:16px 20px; flex:1; }
+        .details-person { background:#f8fafc; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; border:1px solid var(--border); }
+        .details-person .person-name { font-weight:700; color:#1e293b; margin-bottom:6px; }
+        .details-person .person-field { font-size:0.8rem; color:#475569; margin-bottom:3px; display:flex; gap:6px; }
+        .details-person .person-field .field-label { font-weight:600; min-width:70px; }
 
-        /* ========== MAIN ========== */
-        .main-container {
-            flex: 1;
-            padding: 20px 24px;
-            overflow: auto;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-        }
-        .tree-wrapper {
-            min-width: 100%;
-            width: max-content;
-            padding-right: 40px;
-        }
+        /* TREE */
+        .tree-wrapper { min-width:100%; width:max-content; padding-right:40px; }
+        .tree-node { margin-left:28px; position:relative; }
+        .tree-node.root { margin-left:0; }
+        .tree-children { position:relative; margin-left:0; overflow:hidden; transition:max-height 0.4s ease, opacity 0.3s ease; }
+        .tree-children.collapsed { max-height:0!important; opacity:0; }
+        .node-card { display:inline-flex; align-items:center; gap:10px; padding:10px 16px; margin:5px 0; border-radius:var(--radius); cursor:pointer; transition:var(--transition); position:relative; border:1.5px solid transparent; background:#fff; box-shadow:var(--shadow-sm); max-width:500px; min-width:200px; user-select:none; }
+        .node-card:hover { box-shadow:var(--shadow); transform:translateY(-1px); }
+        .node-card.highlighted { box-shadow:0 0 0 4px rgba(99,102,241,0.35); border-color:#6366f1!important; animation:pulse-highlight 0.6s ease-out; z-index:10; }
+        @keyframes pulse-highlight { 0%,100%{ box-shadow:0 0 0 4px rgba(99,102,241,0.35); } 50%{ box-shadow:0 0 0 12px rgba(99,102,241,0.08); } }
+        .node-card .type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+        .type-dot.directorio{ background:#1e293b; } .type-dot.transversal{ background:#6366f1; } .type-dot.gas{ background:#f59e0b; } .type-dot.electricidad{ background:#3b82f6; }
+        .node-card .node-info { flex:1; min-width:0; }
+        .node-card .node-name { font-weight:700; font-size:0.85rem; color:#1e293b; }
+        .node-card .node-responsables { font-size:0.72rem; color:#64748b; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .node-card .node-type-badge { font-size:0.65rem; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:50px; letter-spacing:0.5px; flex-shrink:0; }
+        .badge-directorio{ background:#e2e8f0; color:#1e293b; } .badge-transversal{ background:#eef2ff; color:#4f46e5; } .badge-gas{ background:#fffbeb; color:#b45309; } .badge-electricidad{ background:#eff6ff; color:#1d4ed8; }
+        .node-card .toggle-btn { width:24px; height:24px; border-radius:50%; border:1.5px solid #cbd5e1; background:#fff; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); flex-shrink:0; font-weight:700; color:#64748b; }
+        .node-card .toggle-btn:hover { background:#f1f5f9; }
+        .node-card.no-children .toggle-btn { visibility:hidden; }
 
-        /* ========== TREE NODES ========== */
-        .tree-node {
-            margin-left: 28px;
-            position: relative;
-        }
-        .tree-node.root {
-            margin-left: 0;
-        }
-        .tree-children {
-            position: relative;
-            margin-left: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, opacity 0.3s ease;
-        }
-        .tree-children.collapsed {
-            max-height: 0 !important;
-            opacity: 0;
-        }
-        .node-card {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            margin: 5px 0;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            border: 1.5px solid transparent;
-            background: #fff;
-            box-shadow: var(--shadow-sm);
-            max-width: 500px;
-            min-width: 200px;
-            user-select: none;
-        }
-        .node-card:hover {
-            box-shadow: var(--shadow);
-            transform: translateY(-1px);
-        }
-        .node-card.highlighted {
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.35);
-            border-color: #6366f1 !important;
-            animation: pulse-highlight 0.6s ease-out;
-            z-index: 10;
-        }
-        @keyframes pulse-highlight {
-            0%,
-            100% {
-                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.35);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(99, 102, 241, 0.08);
-            }
-        }
-        .node-card .type-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .type-dot.directorio {
-            background: #1e293b;
-        }
-        .type-dot.transversal {
-            background: #6366f1;
-        }
-        .type-dot.gas {
-            background: #f59e0b;
-        }
-        .type-dot.electricidad {
-            background: #3b82f6;
-        }
-        .node-card .node-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .node-card .node-name {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #1e293b;
-            line-height: 1.3;
-        }
-        .node-card .node-responsables {
-            font-size: 0.72rem;
-            color: #64748b;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .node-card .node-type-badge {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: 50px;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-        }
-        .badge-directorio {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-        .badge-transversal {
-            background: #eef2ff;
-            color: #4f46e5;
-        }
-        .badge-gas {
-            background: #fffbeb;
-            color: #b45309;
-        }
-        .badge-electricidad {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-        .node-card .toggle-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 1.5px solid #cbd5e1;
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            flex-shrink: 0;
-            font-weight: 700;
-            color: #64748b;
-        }
-        .node-card .toggle-btn:hover {
-            background: #f1f5f9;
-            border-color: #94a3b8;
-        }
-        .node-card .toggle-btn.empty {
-            visibility: hidden;
-            pointer-events: none;
-        }
-        .node-card.no-children .toggle-btn {
-            visibility: hidden;
-            pointer-events: none;
-        }
+        .tree-node { border-left:2px solid #dde4ef; padding-left:20px; margin-left:14px; position:relative; }
+        .tree-node.root { border-left:none; padding-left:0; margin-left:0; }
+        .tree-node::before { content:''; position:absolute; left:-2px; top:24px; width:20px; height:2px; background:#dde4ef; }
+        .tree-node.root::before { display:none; }
 
-        /* Líneas conectoras */
-        .tree-node {
-            border-left: 2px solid #dde4ef;
-            padding-left: 20px;
-            margin-left: 14px;
-            position: relative;
-        }
-        .tree-node.root {
-            border-left: none;
-            padding-left: 0;
-            margin-left: 0;
-        }
-        .tree-node::before {
-            content: '';
-            position: absolute;
-            left: -2px;
-            top: 24px;
-            width: 20px;
-            height: 2px;
-            background: #dde4ef;
-        }
-        .tree-node.root::before {
-            display: none;
-        }
-        .tree-node .node-card {
-            margin-left: 0;
-        }
-        .tree-children>.tree-node:first-child::before {
-            top: 24px;
-            height: 50%;
-        }
-
-        /* ========== TOAST ========== */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            color: #fff;
-            font-weight: 600;
-            font-size: 0.85rem;
-            box-shadow: var(--shadow-lg);
-            animation: slideIn 0.3s ease;
-            max-width: 400px;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .toast.info {
-            background: #6366f1;
-        }
-        .toast.success {
-            background: #10b981;
-        }
-
-        /* ========== EMPTY STATE ========== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-        .empty-state .icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 768px) {
-            .header {
-                padding: 10px 14px;
-                gap: 8px;
-            }
-            .header-logo {
-                font-size: 0.9rem;
-            }
-            .search-wrap {
-                min-width: 150px;
-            }
-            .toolbar {
-                padding: 8px 14px;
-                gap: 4px;
-            }
-            .toolbar .btn {
-                padding: 6px 10px;
-                font-size: 0.7rem;
-            }
-            .node-card {
-                max-width: 90vw;
-                padding: 8px 12px;
-                font-size: 0.75rem;
-            }
-            .main-container {
-                padding: 12px 8px;
-            }
-            .tree-node {
-                margin-left: 10px;
-                padding-left: 14px;
-            }
-        }
+        /* TOAST */
+        .toast-container { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+        .toast { padding:12px 20px; border-radius:var(--radius-sm); color:#fff; font-weight:600; font-size:0.85rem; box-shadow:var(--shadow-lg); animation:slideIn 0.3s ease; max-width:400px; }
+        @keyframes slideIn { from{transform:translateX(120%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+        .toast.info{background:#6366f1;} .toast.success{background:#10b981;}
+        .btn-icon { background:none; border:none; cursor:pointer; font-size:1.2rem; padding:4px; border-radius:4px; }
+        .btn-icon:hover { background:#e2e8f0; }
     </style>
 </head>
 <body>
-
-    <!-- HEADER -->
     <header class="header">
-        <div class="header-logo">
-            <div class="icon">🏛️</div>
-            <span>ENREGE</span>
-        </div>
+        <div class="header-logo"><div class="icon">🏛️</div><span>ENREGE</span></div>
         <div class="search-wrap">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" placeholder="Buscar por nombre, responsable o tipo...">
@@ -507,7 +111,6 @@
         </div>
     </header>
 
-    <!-- TOOLBAR -->
     <div class="toolbar">
         <button class="btn filter-all active-filter" data-filter="all">🌐 Todos</button>
         <button class="btn filter-directorio" data-filter="directorio">🏛️ Directorio</button>
@@ -516,26 +119,28 @@
         <button class="btn filter-elec" data-filter="electricidad">⚡ Electricidad</button>
         <span class="spacer"></span>
         <span class="stats">Nodos visibles: <span id="visibleCount">0</span> / <span id="totalCount">0</span></span>
-        <button class="btn" id="expandAllBtn" title="Expandir todo">📂 Expandir todo</button>
-        <button class="btn danger" id="collapseAllBtn" title="Colapsar todo">📁 Colapsar todo</button>
+        <button class="btn" id="expandAllBtn">📂 Expandir</button>
+        <button class="btn danger" id="collapseAllBtn">📁 Colapsar</button>
     </div>
 
-    <!-- MAIN -->
-    <div class="main-container" id="mainContainer">
-        <div class="tree-wrapper" id="treeWrapper">
-            <div class="empty-state" id="emptyState">
-                <div class="icon">📭</div>
-                <p>Cargando organigrama...</p>
+    <div class="main-container">
+        <div class="tree-panel" id="treePanel">
+            <div class="tree-wrapper" id="treeWrapper"></div>
+        </div>
+        <div class="details-panel" id="detailsPanel">
+            <div class="details-header">
+                <span id="detailsNodeName">Detalle de responsables</span>
+                <button class="btn-icon" id="closeDetailsBtn" style="margin-left:auto;">✕</button>
             </div>
+            <div class="details-content" id="detailsContent"></div>
         </div>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
-            // ==================== DATOS INICIALES (JSON EMBEBIDO) ====================
+            // ==================== DATOS INICIALES (string → objeto migración) ====================
             const initialData = {
                 "id": "ENREGE",
                 "name": "ENTE NACIONAL REGULADOR DEL GAS Y LA ELECTRICIDAD (ENREGE)",
@@ -1118,273 +723,180 @@
                 }]
             };
 
-            // ==================== ESTADO ====================
+            // ==================== MIGRACIÓN A OBJETOS ====================
+            function migrateResponsablesToObjects(node) {
+                if (!node.responsables) node.responsables = [];
+                node.responsables = node.responsables.map(r => {
+                    if (typeof r === 'string') {
+                        return { nombre: r, telefono: '', ubicacion: '', fechaNacimiento: '', extra: {} };
+                    }
+                    if (!r.extra) r.extra = {};
+                    return r;
+                });
+                if (node.children) node.children.forEach(migrateResponsablesToObjects);
+            }
+
             const STORAGE_KEY = 'organigrama_enrege_data';
             let organigramaData = null;
             let currentFilter = 'all';
             let highlightedNodeId = null;
             let collapsedNodes = new Set();
 
-            // ==================== CARGA DE DATOS ====================
             function loadData() {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (stored) {
-                    try {
-                        organigramaData = JSON.parse(stored);
-                    } catch (e) {
-                        organigramaData = JSON.parse(JSON.stringify(initialData));
-                    }
+                    try { organigramaData = JSON.parse(stored); } catch(e) { organigramaData = JSON.parse(JSON.stringify(initialData)); }
                 } else {
                     organigramaData = JSON.parse(JSON.stringify(initialData));
-                    saveData();
                 }
+                // Migrar por si acaso
+                migrateResponsablesToObjects(organigramaData);
+                saveData();
             }
 
-            function saveData() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(organigramaData));
-            }
+            function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(organigramaData)); }
 
-            // ==================== CONTEO DE NODOS ====================
-            function countNodes(node, filter = 'all') {
+            function countNodes(node, filter='all') {
                 let count = 0;
                 if (filter === 'all' || node.type === filter) count = 1;
-                if (node.children) {
-                    for (const child of node.children) {
-                        count += countNodes(child, filter);
-                    }
-                }
+                if (node.children) node.children.forEach(ch => count += countNodes(ch, filter));
                 return count;
             }
+            function countAllNodes(node) { let c=1; if(node.children) node.children.forEach(ch=>c+=countAllNodes(ch)); return c; }
 
-            function countAllNodes(node) {
-                let count = 1;
-                if (node.children) {
-                    for (const child of node.children) {
-                        count += countAllNodes(child);
-                    }
+            // ==================== DETALLES PANEL ====================
+            function showDetails(nodeId) {
+                const node = findNodeById(nodeId);
+                if (!node) return;
+                const panel = document.getElementById('detailsPanel');
+                document.getElementById('detailsNodeName').textContent = node.shortName || node.name;
+                const content = document.getElementById('detailsContent');
+                let html = '';
+                if (!node.responsables || node.responsables.length === 0) {
+                    html = '<p style="color:#64748b;">Sin responsables asignados.</p>';
+                } else {
+                    node.responsables.forEach((p, idx) => {
+                        html += `<div class="details-person">
+                            <div class="person-name">${p.nombre || 'Sin nombre'}</div>`;
+                        if (p.telefono) html += `<div class="person-field"><span class="field-label">📞 Tel:</span>${p.telefono}</div>`;
+                        if (p.ubicacion) html += `<div class="person-field"><span class="field-label">📍 Ubicación:</span>${p.ubicacion}</div>`;
+                        if (p.fechaNacimiento) html += `<div class="person-field"><span class="field-label">🎂 Nac:</span>${p.fechaNacimiento}</div>`;
+                        if (p.extra && Object.keys(p.extra).length) {
+                            for (let [k,v] of Object.entries(p.extra)) {
+                                html += `<div class="person-field"><span class="field-label">🔹 ${k}:</span>${v}</div>`;
+                            }
+                        }
+                        html += `</div>`;
+                    });
                 }
-                return count;
+                content.innerHTML = html;
+                panel.classList.add('active');
             }
 
-            // ==================== RENDERIZADO DEL ÁRBOL ====================
-            function createNodeElement(node, depth = 0) {
+            function hideDetails() { document.getElementById('detailsPanel').classList.remove('active'); }
+
+            // ==================== RENDERIZADO ====================
+            function createNodeElement(node, depth=0) {
                 const hasChildren = node.children && node.children.length > 0;
                 const isCollapsed = collapsedNodes.has(node.id);
                 const isHighlighted = highlightedNodeId === node.id;
 
                 const treeNode = document.createElement('div');
-                treeNode.className = 'tree-node' + (depth === 0 ? ' root' : '');
+                treeNode.className = 'tree-node' + (depth===0?' root':'');
                 treeNode.setAttribute('data-node-id', node.id);
-                treeNode.setAttribute('data-type', node.type);
 
                 const card = document.createElement('div');
-                card.className = 'node-card' + (hasChildren ? '' : ' no-children') + (isHighlighted ?
-                    ' highlighted' : '');
-                card.setAttribute('data-id', node.id);
-                card.style.borderLeft = '3px solid var(--color-' + node.type + ')';
+                card.className = 'node-card' + (hasChildren?'':' no-children') + (isHighlighted?' highlighted':'');
+                card.style.borderLeft = '3px solid var(--color-'+node.type+')';
+                card.innerHTML = `
+                    <span class="type-dot ${node.type}"></span>
+                    <div class="node-info">
+                        <div class="node-name">${node.shortName || node.name}</div>
+                        <div class="node-responsables">${node.responsables.map(p=>p.nombre).join(' | ') || ''}</div>
+                    </div>
+                    <span class="node-type-badge badge-${node.type}">${({directorio:'DIR',transversal:'TRANS',gas:'GAS',electricidad:'ELEC'})[node.type]}</span>
+                    <button class="toggle-btn ${hasChildren?'':'empty'}">${hasChildren?(isCollapsed?'▶':'▼'):''}</button>
+                `;
+                card.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') return;
+                    if (highlightedNodeId === node.id) {
+                        highlightedNodeId = null;
+                        hideDetails();
+                    } else {
+                        highlightedNodeId = node.id;
+                        showDetails(node.id);
+                    }
+                    renderTree();
+                    if (highlightedNodeId) scrollToHighlighted();
+                });
 
-                const dot = document.createElement('span');
-                dot.className = 'type-dot ' + node.type;
-                card.appendChild(dot);
-
-                const info = document.createElement('div');
-                info.className = 'node-info';
-                const nameEl = document.createElement('div');
-                nameEl.className = 'node-name';
-                nameEl.textContent = /*node.shortName ||*/ node.name || node.shortName;
-                info.appendChild(nameEl);
-
-                if (node.responsables && node.responsables.length > 0 && node.responsables[0] !== '') {
-                    const respEl = document.createElement('div');
-                    respEl.className = 'node-responsables';
-                    respEl.textContent = node.responsables.join(' | ');
-                    respEl.title = node.responsables.join('\n');
-                    info.appendChild(respEl);
-                }
-                card.appendChild(info);
-
-                const badge = document.createElement('span');
-                badge.className = 'node-type-badge badge-' + node.type;
-                const typeLabels = { directorio: 'DIR', transversal: 'TRANS', gas: 'GAS', electricidad: 'ELEC' };
-                badge.textContent = typeLabels[node.type] || node.type;
-                card.appendChild(badge);
-
-                const toggleBtn = document.createElement('button');
-                toggleBtn.className = 'toggle-btn' + (hasChildren ? '' : ' empty');
-                toggleBtn.textContent = hasChildren ? (isCollapsed ? '▶' : '▼') : '';
-                toggleBtn.title = hasChildren ? (isCollapsed ? 'Expandir' : 'Colapsar') : '';
+                const toggleBtn = card.querySelector('.toggle-btn');
                 if (hasChildren) {
                     toggleBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        toggleCollapse(node.id);
+                        if (collapsedNodes.has(node.id)) collapsedNodes.delete(node.id);
+                        else collapsedNodes.add(node.id);
+                        renderTree();
+                        if (highlightedNodeId) scrollToHighlighted();
                     });
                 }
-                card.appendChild(toggleBtn);
-
-                card.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (highlightedNodeId === node.id) {
-                        highlightedNodeId = null;
-                    } else {
-                        highlightedNodeId = node.id;
-                    }
-                    renderTree();
-                    if (highlightedNodeId) {
-                        scrollToHighlighted();
-                    }
-                });
 
                 treeNode.appendChild(card);
-
                 if (hasChildren) {
                     const childrenContainer = document.createElement('div');
-                    childrenContainer.className = 'tree-children' + (isCollapsed ? ' collapsed' : '');
-                    childrenContainer.setAttribute('data-parent-id', node.id);
-
+                    childrenContainer.className = 'tree-children' + (isCollapsed?' collapsed':'');
                     for (const child of node.children) {
-                        if (currentFilter === 'all' || child.type === currentFilter || hasMatchingDescendant(
-                                child, currentFilter)) {
-                            childrenContainer.appendChild(createNodeElement(child, depth + 1));
+                        if (currentFilter==='all' || child.type===currentFilter || hasMatchingDescendant(child, currentFilter)) {
+                            childrenContainer.appendChild(createNodeElement(child, depth+1));
                         }
                     }
                     treeNode.appendChild(childrenContainer);
-
-                    // Ajustar altura para animación
                     if (!isCollapsed) {
-                        requestAnimationFrame(() => {
-                            childrenContainer.style.maxHeight = childrenContainer.scrollHeight +
-                                'px';
-                        });
-                    } else {
-                        childrenContainer.style.maxHeight = '0px';
-                    }
+                        requestAnimationFrame(() => { childrenContainer.style.maxHeight = childrenContainer.scrollHeight+'px'; });
+                    } else { childrenContainer.style.maxHeight = '0px'; }
                 }
-
                 return treeNode;
             }
 
             function hasMatchingDescendant(node, filter) {
-                if (node.type === filter) return true;
-                if (node.children) {
-                    for (const child of node.children) {
-                        if (hasMatchingDescendant(child, filter)) return true;
-                    }
-                }
-                return false;
+                if (node.type===filter) return true;
+                return node.children?.some(ch=>hasMatchingDescendant(ch,filter));
             }
 
             function renderTree() {
                 const wrapper = document.getElementById('treeWrapper');
                 wrapper.innerHTML = '';
-
-                if (!organigramaData) {
-                    wrapper.innerHTML =
-                        '<div class="empty-state"><div class="icon">📭</div><p>No hay datos disponibles.</p></div>';
-                    updateStats();
-                    return;
-                }
-
-                const rootEl = createNodeElement(organigramaData, 0);
-                wrapper.appendChild(rootEl);
-
-                // Expandir todas las alturas después del render
-                requestAnimationFrame(() => {
-                    document.querySelectorAll('.tree-children').forEach(el => {
-                        if (!el.classList.contains('collapsed')) {
-                            el.style.maxHeight = el.scrollHeight + 'px';
-                        }
-                    });
+                if (!organigramaData) return;
+                wrapper.appendChild(createNodeElement(organigramaData, 0));
+                document.querySelectorAll('.tree-children').forEach(el => {
+                    if (!el.classList.contains('collapsed')) el.style.maxHeight = el.scrollHeight+'px';
                 });
-
-                updateStats();
-            }
-
-            function updateStats() {
-                const total = countAllNodes(organigramaData);
-                const visible = currentFilter === 'all' ? total : countNodes(organigramaData, currentFilter);
-                document.getElementById('totalCount').textContent = total;
-                document.getElementById('visibleCount').textContent = visible;
+                document.getElementById('totalCount').textContent = countAllNodes(organigramaData);
+                document.getElementById('visibleCount').textContent = currentFilter==='all' ? countAllNodes(organigramaData) : countNodes(organigramaData, currentFilter);
             }
 
             function scrollToHighlighted() {
-                setTimeout(() => {
-                    const el = document.querySelector('.node-card.highlighted');
-                    if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }, 150);
+                setTimeout(() => { const el = document.querySelector('.node-card.highlighted'); if(el) el.scrollIntoView({behavior:'smooth', block:'center'}); }, 150);
             }
 
-            // ==================== COLAPSAR / EXPANDIR ====================
-            function toggleCollapse(nodeId) {
-                if (collapsedNodes.has(nodeId)) {
-                    collapsedNodes.delete(nodeId);
-                } else {
-                    collapsedNodes.add(nodeId);
-                }
-                // Re-render preservando el estado
-                renderTree();
-                if (highlightedNodeId) {
-                    scrollToHighlighted();
-                }
+            function findNodeById(id, node=organigramaData) {
+                if(!node) return null;
+                if(node.id===id) return node;
+                if(node.children) for(let ch of node.children) { const f = findNodeById(id, ch); if(f) return f; }
+                return null;
             }
 
-            function expandAll() {
-                collapsedNodes.clear();
-                renderTree();
-                showToast('🌳 Todos los nodos expandidos', 'info');
-            }
-
-            function collapseAll() {
-                // Colapsar todos excepto el raíz
-                function collectIds(node) {
-                    if (node.children && node.children.length > 0) {
-                        collapsedNodes.add(node.id);
-                        for (const child of node.children) {
-                            collectIds(child);
-                        }
-                    }
-                }
-                collapsedNodes.clear();
-                if (organigramaData && organigramaData.children) {
-                    for (const child of organigramaData.children) {
-                        collectIds(child);
-                    }
-                }
-                collapsedNodes.delete(organigramaData.id); // No colapsar raíz
-                renderTree();
-                showToast('📁 Todos los nodos colapsados', 'info');
-            }
-
-            // ==================== BÚSQUEDA ====================
             function searchNodes(query) {
                 const results = [];
-                if (!query || query.trim().length < 2) return results;
+                if(!query || query.trim().length<2) return results;
                 const q = query.toLowerCase().trim();
-
-                function search(node, path = []) {
-                    const matchName = node.name.toLowerCase().includes(q) || (node.shortName && node.shortName
-                        .toLowerCase().includes(q));
-                    let matchResp = false;
-                    if (node.responsables) {
-                        matchResp = node.responsables.some(r => r.toLowerCase().includes(q));
+                function search(node, path=[]) {
+                    const matchName = node.name.toLowerCase().includes(q) || (node.shortName||'').toLowerCase().includes(q);
+                    let matchResp = node.responsables?.some(r => r.nombre.toLowerCase().includes(q));
+                    if (matchName || matchResp || node.type.toLowerCase().includes(q)) {
+                        results.push({ node, path:[...path, node], matchField: matchName?'nombre':(matchResp?'responsable':'tipo'), matchType:node.type });
                     }
-                    const matchType = node.type.toLowerCase().includes(q);
-
-                    if (matchName || matchResp || matchType) {
-                        let matchField = matchName ? 'nombre' : (matchResp ? 'responsable' : 'tipo');
-                        results.push({
-                            node: node,
-                            path: [...path, node],
-                            matchField: matchField,
-                            matchType: node.type
-                        });
-                    }
-                    if (node.children) {
-                        for (const child of node.children) {
-                            search(child, [...path, node]);
-                        }
-                    }
+                    node.children?.forEach(ch => search(ch, [...path, node]));
                 }
                 search(organigramaData);
                 return results;
@@ -1393,138 +905,75 @@
             function showSearchResults(results) {
                 const container = document.getElementById('searchResults');
                 container.innerHTML = '';
-                if (results.length === 0) {
-                    container.classList.remove('active');
-                    return;
-                }
-                results.slice(0, 20).forEach((result, idx) => {
+                if (!results.length) { container.classList.remove('active'); return; }
+                results.slice(0,20).forEach(r => {
                     const item = document.createElement('div');
                     item.className = 'search-result-item';
-                    const badge = document.createElement('span');
-                    badge.className = 'match-type badge-' + result.matchType;
-                    badge.textContent = result.matchField;
-                    item.appendChild(badge);
-                    const text = document.createTextNode(result.node.name || result.node.shortName);
-                    item.appendChild(text);
-                    item.addEventListener('click', () => {
-                        navigateToNode(result.node);
-                        container.classList.remove('active');
-                        document.getElementById('searchInput').value = '';
-                    });
+                    item.innerHTML = `<span class="match-type badge-${r.matchType}">${r.matchField}</span>${r.node.shortName||r.node.name}`;
+                    item.addEventListener('click', () => { navigateToNode(r.node); container.classList.remove('active'); document.getElementById('searchInput').value=''; });
                     container.appendChild(item);
                 });
-                if (results.length > 20) {
-                    const more = document.createElement('div');
-                    more.className = 'search-result-item';
-                    more.style.color = '#64748b';
-                    more.style.fontStyle = 'italic';
-                    more.textContent = `... y ${results.length - 20} resultados más (refina tu búsqueda)`;
-                    container.appendChild(more);
-                }
                 container.classList.add('active');
             }
 
             function navigateToNode(node) {
-                // Expandir todos los ancestros
-                function findAndExpand(targetId, currentNode) {
-                    if (currentNode.id === targetId) return true;
-                    if (currentNode.children) {
-                        for (const child of currentNode.children) {
-                            if (findAndExpand(targetId, child)) {
-                                collapsedNodes.delete(currentNode.id);
-                                return true;
-                            }
-                        }
-                    }
+                function expand(id, current) {
+                    if(current.id===id) return true;
+                    if(current.children) for(let ch of current.children) if(expand(id, ch)) { collapsedNodes.delete(current.id); return true; }
                     return false;
                 }
                 collapsedNodes.delete(organigramaData.id);
-                findAndExpand(node.id, organigramaData);
+                expand(node.id, organigramaData);
                 highlightedNodeId = node.id;
+                showDetails(node.id);
                 renderTree();
                 scrollToHighlighted();
             }
 
-            // ==================== FILTROS ====================
             function setFilter(filter) {
                 currentFilter = filter;
-                document.querySelectorAll('.toolbar .btn[data-filter]').forEach(b => b.classList.remove(
-                    'active-filter'));
-                const activeBtn = document.querySelector(`.toolbar .btn[data-filter="${filter}"]`);
-                if (activeBtn) activeBtn.classList.add('active-filter');
+                document.querySelectorAll('.toolbar .btn[data-filter]').forEach(b => b.classList.remove('active-filter'));
+                document.querySelector(`.toolbar .btn[data-filter="${filter}"]`)?.classList.add('active-filter');
                 highlightedNodeId = null;
+                hideDetails();
                 renderTree();
             }
 
-            // ==================== TOAST ====================
-            function showToast(message, type = 'info') {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'toast ' + type;
-                toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s';
-                    setTimeout(() => toast.remove(), 300);
-                }, 2500);
+            function expandAll() { collapsedNodes.clear(); renderTree(); showToast('Expandido','info'); }
+            function collapseAll() {
+                collapsedNodes.clear();
+                function collect(node) { if(node.children?.length){ collapsedNodes.add(node.id); node.children.forEach(collect); } }
+                organigramaData.children?.forEach(collect);
+                renderTree(); showToast('Colapsado','info');
             }
 
-            // ==================== EVENT LISTENERS ====================
+            function showToast(msg,type='info') {
+                const c = document.getElementById('toastContainer');
+                const t = document.createElement('div'); t.className='toast '+type; t.textContent=msg;
+                c.appendChild(t); setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(),300); },2500);
+            }
+
+            // Eventos
             document.getElementById('searchInput').addEventListener('input', function() {
-                const query = this.value;
-                const results = searchNodes(query);
-                showSearchResults(results);
+                showSearchResults(searchNodes(this.value));
             });
-
             document.getElementById('searchInput').addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    document.getElementById('searchResults').classList.remove('active');
-                    this.value = '';
-                }
-                if (e.key === 'Enter') {
-                    const results = searchNodes(this.value);
-                    if (results.length > 0) {
-                        navigateToNode(results[0].node);
-                        document.getElementById('searchResults').classList.remove('active');
-                        this.value = '';
-                    }
-                }
+                if(e.key==='Escape'){ document.getElementById('searchResults').classList.remove('active'); this.value=''; }
+                if(e.key==='Enter'){ const res=searchNodes(this.value); if(res.length){ navigateToNode(res[0].node); document.getElementById('searchResults').classList.remove('active'); this.value=''; } }
             });
-
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-wrap')) {
-                    document.getElementById('searchResults').classList.remove('active');
-                }
-            });
-
-            document.querySelectorAll('.toolbar .btn[data-filter]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    setFilter(this.getAttribute('data-filter'));
-                });
-            });
-
+            document.addEventListener('click', e => { if(!e.target.closest('.search-wrap')) document.getElementById('searchResults').classList.remove('active'); });
+            document.getElementById('closeDetailsBtn').addEventListener('click', hideDetails);
+            document.querySelectorAll('.toolbar .btn[data-filter]').forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
             document.getElementById('expandAllBtn').addEventListener('click', expandAll);
             document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
 
-            // ==================== INICIALIZACIÓN ====================
             function init() {
                 loadData();
+                collapsedNodes.add('DREG');
                 setFilter('all');
-                if (organigramaData && organigramaData.children) {
-                    // Colapsar delegaciones regionales por defecto para mejor visibilidad
-                    collapsedNodes.add('DREG');
-                }
                 renderTree();
-                showToast('✅ Organigrama cargado exitosamente', 'success');
             }
-
             init();
-
-            console.log('📊 Organigrama ENREGE - Visualización lista.');
-            console.log('   Usa el buscador para encontrar personas o unidades.');
-            console.log('   Haz clic en los botones ▼/▶ para colapsar/expandir.');
-            console.log('   Usa los filtros por tipo para ver solo Gas, Electricidad, etc.');
         })();
     </script>
 </body>
