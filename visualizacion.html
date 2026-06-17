@@ -72,8 +72,8 @@
         .toolbar {
             display: flex;
             gap: 8px;
-            /*flex-wrap: wrap;*/
-            overflow-y: scroll;
+            /*flex-wrap: wrap; */
+            overflow-y: hidden;
             padding: 10px 24px;
             background: #fff;
             border-bottom: 1px solid var(--border);
@@ -94,7 +94,7 @@
         .toolbar .btn.filter-directorio.active-filter { background:var(--color-directorio); border-color:var(--color-directorio); }
         .toolbar .btn.danger { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
         .toolbar .spacer { flex:1; }
-        .toolbar .stats { font-size:0.8rem; color:var(--text-secondary); }
+        .toolbar .stats { font-size:0.8rem; color:var(--text-secondary); min-width: fit-content;}
 
 
         /* ========== MAIN CONTAINER ========== */
