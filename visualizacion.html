@@ -89,8 +89,8 @@
         .toolbar .btn.active-filter { background:#6366f1; color:#fff; border-color:#6366f1; }
         .toolbar .btn.filter-gas.active-filter { background:var(--color-gas); border-color:var(--color-gas); }
         .toolbar .btn.filter-elec.active-filter { background:var(--color-electricidad); border-color:var(--color-electricidad); }
-        .toolbar .btn.filter-transversal.active-filter { background:#6366f1; border-color:#6366f1; }
-        .toolbar .btn.filter-directorio.active-filter { background:#1e293b; border-color:#1e293b; }
+        .toolbar .btn.filter-transversal.active-filter { background:var(--color-transversal); border-color:var(--color-transversal); }
+        .toolbar .btn.filter-directorio.active-filter { background:var(--color-directorio); border-color:var(--color-directorio); }
         .toolbar .btn.danger { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
         .toolbar .spacer { flex:1; }
         .toolbar .stats { font-size:0.8rem; color:var(--text-secondary); }
@@ -131,6 +131,7 @@
             position: sticky;       /* NUEVO: el título se queda arriba dentro del panel */
             top: 0;
             z-index: 5;
+            flex-direction: column;
         }        
         .details-content { padding:16px 20px; flex:1; }
         .details-person { background:#f8fafc; border-radius:var(--radius-sm); padding:12px; margin-bottom:12px; border:1px solid var(--border); }
@@ -149,12 +150,17 @@
         .node-card.highlighted { box-shadow:0 0 0 4px rgba(99,102,241,0.35); border-color:#6366f1!important; animation:pulse-highlight 0.6s ease-out; z-index:10; }
         @keyframes pulse-highlight { 0%,100%{ box-shadow:0 0 0 4px rgba(99,102,241,0.35); } 50%{ box-shadow:0 0 0 12px rgba(99,102,241,0.08); } }
         .node-card .type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-        .type-dot.directorio{ background:#1e293b; } .type-dot.transversal{ background:#6366f1; } .type-dot.gas{ background:var(--color-gas); } .type-dot.electricidad{ background:var(--color-electricidad); }
+        .type-dot.directorio{ background:#1e293b; } .type-dot.transversal{ background:var(--color-transversal); } .type-dot.gas{ background:var(--color-gas); } .type-dot.electricidad{ background:var(--color-electricidad); }
         .node-card .node-info { flex:1; min-width:0; }
         .node-card .node-name { font-weight:700; font-size:0.85rem; color:#1e293b; }
         .node-card .node-responsables { font-size:0.72rem; color:#64748b; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .node-card .node-type-badge { font-size:0.65rem; font-weight:700; text-transform:uppercase; padding:3px 8px; border-radius:50px; letter-spacing:0.5px; flex-shrink:0; }
-        .badge-directorio{ background:#e2e8f0; color:#1e293b; } .badge-transversal{ background:#eef2ff; color:#4f46e5; } .badge-gas{ background:#eff6ff; color:#1d4ed8; } .badge-electricidad{ background:#fffbeb; color:#b45309; }
+        
+        .badge-directorio{ background:#e2e8f0; color:#1e293b; } 
+        .badge-transversal{ background:#eef2ff; color:#4f46e5; } 
+        .badge-gas{ background:#eff6ff; color:#1d4ed8; } 
+        .badge-electricidad{ background:#fffbeb; color:#b45309; }
+
         .node-card .toggle-btn { width:24px; height:24px; border-radius:50%; border:1.5px solid #cbd5e1; background:#fff; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); flex-shrink:0; font-weight:700; color:#64748b; }
         .node-card .toggle-btn:hover { background:#f1f5f9; }
         .node-card.no-children .toggle-btn { visibility:hidden; }
@@ -169,8 +175,17 @@
         .toast { padding:12px 20px; border-radius:var(--radius-sm); color:#fff; font-weight:600; font-size:0.85rem; box-shadow:var(--shadow-lg); animation:slideIn 0.3s ease; max-width:400px; }
         @keyframes slideIn { from{transform:translateX(120%);opacity:0;} to{transform:translateX(0);opacity:1;} }
         .toast.info{background:#6366f1;} .toast.success{background:#10b981;}
-        .btn-icon { background:none; border:none; cursor:pointer; font-size:1.2rem; padding:4px; border-radius:4px; }
+        .btn-icon { background:none; border:none; cursor:pointer; font-size:1.2rem; padding:4px; border-radius:4px; margin-bottom: -40px;}
         .btn-icon:hover { background:#e2e8f0; }
+
+        #detailsNodeName {
+            color: #7c7c7c;
+            font-size: small;
+            font-style: italic;
+            background-color: #ebebeb;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -201,6 +216,7 @@
         </div>
         <div class="details-panel" id="detailsPanel">
             <div class="details-header">
+                <span id="detailsNodeShortName">Detalle de responsables</span>
                 <span id="detailsNodeName">Detalle de responsables</span>
                 <button class="btn-icon" id="closeDetailsBtn" style="margin-left:auto;">✕</button>
             </div>
@@ -2928,7 +2944,8 @@
                 const node = findNodeById(nodeId);
                 if (!node) return;
                 const panel = document.getElementById('detailsPanel');
-                document.getElementById('detailsNodeName').textContent = node.shortName || node.name;
+                document.getElementById('detailsNodeName').textContent = node.name || '';
+                document.getElementById('detailsNodeShortname').textContent = node.shortName || '';
                 const content = document.getElementById('detailsContent');
                 let html = '';
                 if (!node.responsables || node.responsables.length === 0) {
