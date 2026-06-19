@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planificador de Fusión — ENRE + ENARGAS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a3a6e;
+    --navy-dark: #0f2349;
+    --navy-light: #2a5298;
+    --orange: #e85d1a;
+    --orange-light: #f07340;
+    --gray-50: #f0f2f5;
+    --gray-100: #e4e7ed;
+    --gray-200: #c8cfd9;
+    --gray-400: #8994a6;
+    --gray-600: #4a5568;
+    --gray-800: #1a202c;
+    --white: #ffffff;
+    --green: #2d7d46;
+    --building-fill: rgba(26,58,110,0.07);
+    --building-stroke: #1a3a6e;
+    --floor-fill: rgba(42,82,152,0.10);
+    --floor-stroke: #2a5298;
+    --sector-fill: rgba(232,93,26,0.08);
+    --sector-stroke: #e85d1a;
+    --workstation-fill: rgba(45,125,70,0.15);
+    --workstation-stroke: #2d7d46;
+    --selected-stroke: #f6c90e;
+    --canvas-bg: #f7f9fc;
+    --grid-color: rgba(26,58,110,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-800);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────── */
+  header {
+    background: var(--navy-dark);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 52px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .logo-pill {
+    background: var(--orange);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+  .logo-sep { color: var(--gray-400); font-size: 18px; font-weight: 200; }
+  header h1 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-200);
+    letter-spacing: 0.2px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.08);
+    color: var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.14); color: white; }
+  .btn-orange {
+    background: var(--orange);
+    color: white;
+    border: 1px solid var(--orange-light);
+  }
+  .btn-orange:hover { background: var(--orange-light); }
+  .btn-navy {
+    background: var(--navy-light);
+    color: white;
+    border: 1px solid var(--navy);
+  }
+  .btn-navy:hover { background: var(--navy); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); color: white; border: 1px solid #245f38; }
+  .btn-green:hover { background: #245f38; }
+
+  /* ─── TOOLBAR ─────────────────────────────────────────── */
+  .toolbar {
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 16px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .tool-group {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding-right: 12px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 8px;
+  }
+  .tool-group:last-child { border-right: none; margin-right: 0; }
+  .tool-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tool-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+  .tool-btn.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange-light);
+  }
+  .tool-btn .icon { font-size: 13px; }
+
+  /* ─── MAIN LAYOUT ─────────────────────────────────────── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── LEFT PANEL ─────────────────────────────────────── */
+  .panel-left {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--white);
+    border-right: 1px solid var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-section {
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .panel-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--gray-50);
+    cursor: pointer;
+    user-select: none;
+  }
+  .panel-section-header h3 {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .panel-section-body { padding: 10px; }
+  .panel-scrollable { flex: 1; overflow-y: auto; }
+
+  /* Agent list */
+  .agent-list { display: flex; flex-direction: column; gap: 4px; }
+  .agent-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--gray-100);
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 12px;
+  }
+  .agent-item:hover { border-color: var(--navy-light); background: #f0f4ff; }
+  .agent-item.selected { border-color: var(--orange); background: #fff5f0; }
+  .agent-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .agent-avatar.enre { background: var(--navy); }
+  .agent-avatar.enargas { background: var(--orange); }
+  .agent-info { flex: 1; min-width: 0; }
+  .agent-name { font-weight: 500; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .agent-org { font-size: 9px; color: var(--gray-400); }
+  .agent-badge {
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .badge-assigned { background: #dcfce7; color: #166534; }
+  .badge-free { background: var(--gray-100); color: var(--gray-400); }
+
+  /* Structure tree */
+  .tree-node { padding: 3px 0; }
+  .tree-node-header {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 8px; border-radius: 4px; cursor: pointer;
+    font-size: 11px; color: var(--gray-600);
+    transition: background 0.1s;
+  }
+  .tree-node-header:hover { background: var(--gray-50); }
+  .tree-node-header.selected { background: #eff6ff; color: var(--navy); font-weight: 500; }
+  .tree-node-children { padding-left: 16px; }
+  .tree-icon { font-size: 11px; }
+
+  /* ─── CANVAS AREA ─────────────────────────────────────── */
+  .canvas-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .canvas-container {
+    flex: 1;
+    overflow: auto;
+    background: var(--canvas-bg);
+    position: relative;
+  }
+  #main-canvas {
+    display: block;
+    cursor: crosshair;
+  }
+  #main-canvas.cursor-select { cursor: default; }
+  #main-canvas.cursor-move { cursor: move; }
+
+  .canvas-info-bar {
+    background: var(--navy-dark);
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 4px 14px;
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .canvas-info-bar span { color: rgba(255,255,255,0.8); }
+
+  /* ─── RIGHT PANEL ─────────────────────────────────────── */
+  .panel-right {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--white);
+    border-left: 1px solid var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .props-header {
+    padding: 12px 14px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .props-body { padding: 12px; overflow-y: auto; flex: 1; }
+  .prop-group { margin-bottom: 14px; }
+  .prop-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .prop-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--gray-200);
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.15s;
+  }
+  .prop-input:focus { outline: none; border-color: var(--navy-light); }
+  .prop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .type-building { background: rgba(26,58,110,0.1); color: var(--navy); }
+  .type-floor { background: rgba(42,82,152,0.1); color: var(--navy-light); }
+  .type-sector { background: rgba(232,93,26,0.1); color: var(--orange); }
+  .type-workstation { background: rgba(45,125,70,0.12); color: var(--green); }
+  .type-agent { background: #f0fdf4; color: #166534; }
+
+  /* Assign agents section */
+  .assign-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+  .assign-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 8px; border-radius: 5px;
+    border: 1px solid var(--gray-100);
+    font-size: 11px; cursor: pointer; transition: all 0.12s;
+  }
+  .assign-item:hover { border-color: var(--navy-light); background: #f0f4ff; }
+  .assign-item.assigned-here { border-color: var(--green); background: #f0fdf4; }
+
+  /* ─── MODALS ─────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 480px;
+    max-width: 95vw;
+    overflow: hidden;
+  }
+  .modal-header {
+    background: var(--navy-dark);
+    color: white;
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-header h2 { font-size: 15px; font-weight: 600; }
+  .modal-close {
+    background: none; border: none; color: rgba(255,255,255,0.6);
+    font-size: 20px; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: white; }
+  .modal-body { padding: 20px; }
+  .modal-footer {
+    padding: 14px 20px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-100);
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 5px; display: block; }
+  .form-input {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--gray-200); border-radius: 6px;
+    font-family: 'Inter', sans-serif; font-size: 13px;
+    color: var(--gray-800); background: var(--white);
+  }
+  .form-input:focus { outline: none; border-color: var(--navy-light); }
+  .form-select {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid var(--gray-200); border-radius: 6px;
+    font-family: 'Inter', sans-serif; font-size: 13px;
+    background: var(--white); color: var(--gray-800);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* JSON panel */
+  .json-panel {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: 500px; max-width: 95vw;
+    background: var(--navy-dark);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.4);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 500;
+    display: flex; flex-direction: column;
+  }
+  .json-panel.open { transform: translateX(0); }
+  .json-panel-header {
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .json-panel-header h3 { color: white; font-size: 13px; font-weight: 600; }
+  .json-content {
+    flex: 1; overflow: auto; padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #a8d4ff;
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  /* notification toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--navy-dark); color: white;
+    padding: 10px 20px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none; z-index: 2000;
+  }
+  .toast.show { opacity: 1; }
+
+  /* assign panel inside right props */
+  .multi-agent-assign {
+    background: var(--gray-50);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 8px;
+  }
+  .multi-agent-assign h4 {
+    font-size: 10px; font-weight: 600;
+    color: var(--gray-400); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+
+  .divider {
+    height: 1px; background: var(--gray-100); margin: 12px 0;
+  }
+
+  .empty-state {
+    text-align: center; padding: 30px 20px;
+    color: var(--gray-400); font-size: 12px; line-height: 1.6;
+  }
+  .empty-state .icon { font-size: 28px; margin-bottom: 8px; }
+
+  /* Canvas zoom controls */
+  .zoom-controls {
+    position: absolute; bottom: 16px; right: 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .zoom-btn {
+    width: 32px; height: 32px;
+    background: white; border: 1px solid var(--gray-200);
+    border-radius: 6px; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.1s; color: var(--gray-600);
+  }
+  .zoom-btn:hover { background: var(--gray-50); border-color: var(--navy-light); }
+
+  /* legend */
+  .legend {
+    display: flex; gap: 12px; align-items: center;
+    padding: 6px 16px;
+    background: white;
+    border-top: 1px solid var(--gray-100);
+    font-size: 10px; color: var(--gray-400);
+    flex-shrink: 0;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 2px;
+    border: 2px solid;
+  }
+
+  /* Drag-select overlay on canvas */
+  #select-rect {
+    position: absolute;
+    border: 2px dashed var(--orange);
+    background: rgba(232,93,26,0.06);
+    pointer-events: none;
+    display: none;
+  }
+
+  .btn-danger { background: #dc2626; color: white; border: 1px solid #b91c1c; }
+  .btn-danger:hover { background: #b91c1c; }
+
+  /* Agent count bubble on workstation */
+  .ws-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--green); color: white;
+    width: 16px; height: 16px; border-radius: 50%;
+    font-size: 9px; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-brand">
+    <div class="header-logo">
+      <span class="logo-pill">ENRE</span>
+      <span class="logo-sep">+</span>
+      <span class="logo-pill" style="background:var(--orange)">ENARGAS</span>
+    </div>
+    <h1>Planificador de Fusión · Puestos de Trabajo</h1>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="toggleJson()">📄 Ver JSON</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportJson()">⬇ Exportar</button>
+    <button class="btn btn-ghost btn-sm" onclick="importJson()">⬆ Importar</button>
+    <button class="btn btn-green btn-sm" onclick="saveToStorage()">💾 Guardar</button>
+    <button class="btn btn-ghost btn-sm" onclick="clearAll()" style="color:#f87171">🗑 Limpiar</button>
+  </div>
+</header>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tool-group">
+    <span class="tool-label">Modo</span>
+    <button class="tool-btn active" id="tool-select" onclick="setTool('select')">
+      <span class="icon">↖</span> Seleccionar
+    </button>
+  </div>
+  <div class="tool-group">
+    <span class="tool-label">Crear</span>
+    <button class="tool-btn" id="tool-building" onclick="setTool('building')">
+      <span class="icon">🏛</span> Edificio
+    </button>
+    <button class="tool-btn" id="tool-floor" onclick="setTool('floor')">
+      <span class="icon">📐</span> Piso
+    </button>
+    <button class="tool-btn" id="tool-sector" onclick="setTool('sector')">
+      <span class="icon">🔷</span> Sector
+    </button>
+    <button class="tool-btn" id="tool-workstation" onclick="setTool('workstation')">
+      <span class="icon">💼</span> Puesto
+    </button>
+  </div>
+  <div class="tool-group">
+    <span class="tool-label">Agentes</span>
+    <button class="tool-btn btn-sm" onclick="openAgentModal()">
+      <span class="icon">👤</span> Nuevo Agente
+    </button>
+    <button class="tool-btn btn-sm" id="tool-assign" onclick="startAssignMode()">
+      <span class="icon">📌</span> Asignar Seleccionados
+    </button>
+  </div>
+  <div class="tool-group">
+    <span class="tool-label">Vista</span>
+    <button class="tool-btn btn-sm" onclick="fitView()">
+      <span class="icon">⊡</span> Ajustar
+    </button>
+    <button class="tool-btn btn-sm" onclick="resetZoom()">
+      <span class="icon">↺</span> 1:1
+    </button>
+  </div>
+</div>
+
+<!-- MAIN APP BODY -->
+<div class="app-body">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="panel-section">
+      <div class="panel-section-header" onclick="toggleSection('sec-agents')">
+        <h3>👥 Agentes</h3>
+        <span id="sec-agents-icon">▾</span>
+      </div>
+      <div id="sec-agents" class="panel-section-body">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input class="prop-input" id="agent-search" placeholder="Buscar..." oninput="filterAgents(this.value)" style="flex:1">
+        </div>
+        <div class="agent-list" id="agent-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+    <div class="panel-section panel-scrollable">
+      <div class="panel-section-header" onclick="toggleSection('sec-tree')">
+        <h3>🗂 Estructura</h3>
+        <span id="sec-tree-icon">▾</span>
+      </div>
+      <div id="sec-tree" class="panel-section-body">
+        <div id="structure-tree">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrapper">
+    <div class="canvas-container" id="canvas-container">
+      <canvas id="main-canvas" width="2400" height="1600"></canvas>
+      <div id="select-rect"></div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()">+</button>
+        <button class="zoom-btn" id="zoom-label" style="font-size:9px;pointer-events:none;width:auto;padding:0 6px">100%</button>
+        <button class="zoom-btn" onclick="zoomOut()">−</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--building-stroke);background:var(--building-fill)"></div> Edificio</div>
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--floor-stroke);background:var(--floor-fill)"></div> Piso</div>
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--sector-stroke);background:var(--sector-fill)"></div> Sector</div>
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--workstation-stroke);background:var(--workstation-fill)"></div> Puesto</div>
+      <div class="legend-item" style="margin-left:auto;font-size:10px;color:var(--gray-400)">
+        Clic+arrastrar para crear · Del para eliminar · Ctrl+Z para deshacer
+      </div>
+    </div>
+    <div class="canvas-info-bar" id="canvas-info">
+      <span>X: <span id="info-x">0</span></span>
+      <span>Y: <span id="info-y">0</span></span>
+      <span>Zoom: <span id="info-zoom">100</span>%</span>
+      <span id="info-selection"></span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+    <div class="props-header">⚙ Propiedades</div>
+    <div class="props-body" id="props-body">
+      <div class="empty-state">
+        <div class="icon">↖</div>
+        Selecciona un elemento en el canvas para ver sus propiedades
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JSON PANEL -->
+<div class="json-panel" id="json-panel">
+  <div class="json-panel-header">
+    <h3>📄 Modelo JSON</h3>
+    <button class="btn btn-ghost btn-sm" onclick="toggleJson()">✕ Cerrar</button>
+  </div>
+  <div class="json-content" id="json-content"></div>
+</div>
+
+<!-- ADD AGENT MODAL -->
+<div class="modal-overlay" id="modal-agent">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>👤 Nuevo Agente</h2>
+      <button class="modal-close" onclick="closeModal('modal-agent')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input class="form-input" id="ag-nombre" placeholder="Nombre">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellido *</label>
+          <input class="form-input" id="ag-apellido" placeholder="Apellido">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Legajo</label>
+          <input class="form-input" id="ag-legajo" placeholder="Nro. legajo">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Organismo *</label>
+          <select class="form-select" id="ag-org">
+            <option value="ENRE">ENRE</option>
+            <option value="ENARGAS">ENARGAS</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cargo / Función</label>
+          <input class="form-input" id="ag-cargo" placeholder="Ej: Analista">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área</label>
+          <input class="form-input" id="ag-area" placeholder="Ej: Administración">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-agent')">Cancelar</button>
+      <button class="btn btn-navy btn-sm" onclick="saveAgent()">Guardar Agente</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAME DIALOG MODAL -->
+<div class="modal-overlay" id="modal-name">
+  <div class="modal" style="width:360px">
+    <div class="modal-header">
+      <h2 id="modal-name-title">Nombrar elemento</h2>
+      <button class="modal-close" onclick="closeModal('modal-name')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input class="form-input" id="elem-name-input" placeholder="Ingresar nombre..." autofocus>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="cancelNameModal()">Cancelar</button>
+      <button class="btn btn-navy btn-sm" onclick="confirmNameModal()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSIGN WORKSTATION MODAL -->
+<div class="modal-overlay" id="modal-assign">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📌 Asignar Puesto de Trabajo</h2>
+      <button class="modal-close" onclick="closeModal('modal-assign')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--gray-600);margin-bottom:14px">
+        Seleccionaste <strong id="assign-agent-count">0</strong> agente(s). 
+        Elige el puesto de trabajo donde serán asignados:
+      </p>
+      <div class="form-group">
+        <label class="form-label">Puesto de Trabajo</label>
+        <select class="form-select" id="assign-ws-select">
+          <option value="">— Seleccionar puesto —</option>
+        </select>
+      </div>
+      <div id="assign-agents-preview" style="margin-top:10px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-assign')">Cancelar</button>
+      <button class="btn btn-orange btn-sm" onclick="confirmAssign()">Asignar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- IMPORT TEXTAREA (hidden) -->
+<textarea id="import-ta" style="display:none"></textarea>
+<input type="file" id="import-file" style="display:none" accept=".json" onchange="handleImportFile(event)">
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let state = {
+  buildings: [],   // { id, name, x, y, w, h }
+  floors: [],      // { id, name, buildingId, x, y, w, h }
+  sectors: [],     // { id, name, floorId, x, y, w, h }
+  workstations: [], // { id, name, sectorId, x, y, w, h, agentIds:[] }
+  agents: []       // { id, name, apellido, legajo, org, cargo, area }
+};
+
+let nextId = 1;
+const genId = (prefix) => `${prefix}_${nextId++}`;
+
+let currentTool = 'select';
+let zoom = 1;
+let panX = 0, panY = 0;
+
+// Drawing state
+let isDrawing = false;
+let drawStart = null;
+let drawRect = null;
+
+// Selection
+let selectedIds = [];   // element ids
+let selectedAgentIds = [];  // agent ids (for multi-select)
+let hoveredId = null;
+
+// Drag/resize
+let isDragging = false;
+let dragStartPos = null;
+let dragElemStart = null;
+let resizing = false;
+let resizeHandle = null;
+let resizeElemStart = null;
+
+// Undo stack
+let history = [];
+const HISTORY_MAX = 50;
+
+// Assign mode
+let assignMode = false;
+
+const canvas = document.getElementById('main-canvas');
+const ctx = canvas.getContext('2d');
+
+// ═══════════════════════════════════════════════════════════
+//  CANVAS COORDINATE HELPERS
+// ═══════════════════════════════════════════════════════════
+function toWorld(cx, cy) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (cx - rect.left) / zoom,
+    y: (cy - rect.top) / zoom
+  };
+}
+function toCanvas(wx, wy) {
+  return { x: wx * zoom, y: wy * zoom };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════════════
+const COLORS = {
+  building: { fill: 'rgba(26,58,110,0.07)', stroke: '#1a3a6e', text: '#1a3a6e' },
+  floor:    { fill: 'rgba(42,82,152,0.10)', stroke: '#2a5298', text: '#2a5298' },
+  sector:   { fill: 'rgba(232,93,26,0.08)', stroke: '#e85d1a', text: '#e85d1a' },
+  workstation: { fill: 'rgba(45,125,70,0.15)', stroke: '#2d7d46', text: '#2d7d46' }
+};
+const SELECTED_COLOR = '#f6c90e';
+const HOVERED_COLOR  = '#90cdf4';
+
+function draw() {
+  ctx.save();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.scale(zoom, zoom);
+
+  drawGrid();
+
+  // Draw in z-order: buildings → floors → sectors → workstations
+  state.buildings.forEach(b => drawElement(b, 'building'));
+  state.floors.forEach(f => drawElement(f, 'floor'));
+  state.sectors.forEach(s => drawElement(s, 'sector'));
+  state.workstations.forEach(w => drawWorkstation(w));
+
+  // Draw in-progress rect
+  if (isDrawing && drawRect) {
+    const c = COLORS[currentTool] || COLORS.building;
+    ctx.strokeStyle = c.stroke;
+    ctx.lineWidth = 1.5 / zoom;
+    ctx.setLineDash([4 / zoom, 4 / zoom]);
+    ctx.fillStyle = c.fill;
+    ctx.fillRect(drawRect.x, drawRect.y, drawRect.w, drawRect.h);
+    ctx.strokeRect(drawRect.x, drawRect.y, drawRect.w, drawRect.h);
+    ctx.setLineDash([]);
+  }
+
+  ctx.restore();
+}
+
+function drawGrid() {
+  const gridSize = 40;
+  ctx.strokeStyle = 'rgba(26,58,110,0.07)';
+  ctx.lineWidth = 0.5 / zoom;
+  for (let x = 0; x < canvas.width / zoom; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height / zoom); ctx.stroke();
+  }
+  for (let y = 0; y < canvas.height / zoom; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width / zoom, y); ctx.stroke();
+  }
+}
+
+function drawElement(el, type) {
+  const c = COLORS[type];
+  const isSelected = selectedIds.includes(el.id);
+  const isHovered  = hoveredId === el.id;
+
+  // Shadow for selected
+  if (isSelected) {
+    ctx.shadowColor = SELECTED_COLOR;
+    ctx.shadowBlur = 10 / zoom;
+  }
+
+  ctx.fillStyle = c.fill;
+  ctx.strokeStyle = isSelected ? SELECTED_COLOR : (isHovered ? HOVERED_COLOR : c.stroke);
+  ctx.lineWidth = isSelected ? 2.5 / zoom : 1.5 / zoom;
+  ctx.setLineDash(isSelected ? [6/zoom, 3/zoom] : []);
+
+  ctx.fillRect(el.x, el.y, el.w, el.h);
+  ctx.strokeRect(el.x, el.y, el.w, el.h);
+  ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
+
+  // Label
+  const fontSize = Math.max(10 / zoom, Math.min(14 / zoom, el.h * 0.15));
+  ctx.fillStyle = c.text;
+  ctx.font = `600 ${fontSize}px Inter, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const label = el.name || '(sin nombre)';
+  ctx.fillText(label, el.x + el.w / 2, el.y + 6 / zoom, el.w - 10 / zoom);
+
+  // Type label (top-left corner badge)
+  const typeLabelSize = Math.max(8/zoom, 10/zoom);
+  ctx.font = `500 ${typeLabelSize}px Inter, sans-serif`;
+  ctx.fillStyle = c.stroke + 'aa';
+  const typeNames = { building:'Edificio', floor:'Piso', sector:'Sector' };
+  ctx.textAlign = 'left';
+  ctx.fillText(typeNames[type] || '', el.x + 4/zoom, el.y + 4/zoom, el.w - 8/zoom);
+
+  // Resize handles for selected
+  if (isSelected) drawResizeHandles(el);
+}
+
+function drawWorkstation(ws) {
+  const isSelected = selectedIds.includes(ws.id);
+  const isHovered  = hoveredId === ws.id;
+  const agentCount = (ws.agentIds || []).length;
+
+  if (isSelected) {
+    ctx.shadowColor = SELECTED_COLOR;
+    ctx.shadowBlur = 10 / zoom;
+  }
+
+  ctx.fillStyle = agentCount > 0 ? 'rgba(45,125,70,0.18)' : COLORS.workstation.fill;
+  ctx.strokeStyle = isSelected ? SELECTED_COLOR : (isHovered ? HOVERED_COLOR : COLORS.workstation.stroke);
+  ctx.lineWidth = isSelected ? 2.5 / zoom : 1.5 / zoom;
+  ctx.setLineDash([]);
+  ctx.fillRect(ws.x, ws.y, ws.w, ws.h);
+  ctx.strokeRect(ws.x, ws.y, ws.w, ws.h);
+  ctx.shadowBlur = 0;
+
+  // Icon
+  const iconSize = Math.max(14/zoom, Math.min(20/zoom, ws.h * 0.3));
+  ctx.font = `${iconSize}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#000';
+  ctx.fillText('💼', ws.x + ws.w / 2, ws.y + ws.h / 2 - 6/zoom);
+
+  // Name
+  const fontSize = Math.max(8/zoom, Math.min(11/zoom, ws.h * 0.15));
+  ctx.font = `500 ${fontSize}px Inter, sans-serif`;
+  ctx.fillStyle = COLORS.workstation.text;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(ws.name || 'Puesto', ws.x + ws.w/2, ws.y + ws.h - fontSize - 6/zoom, ws.w - 6/zoom);
+
+  // Agent count badge
+  if (agentCount > 0) {
+    const bx = ws.x + ws.w - 12/zoom;
+    const by = ws.y + 4/zoom;
+    const br = 8/zoom;
+    ctx.fillStyle = COLORS.workstation.stroke;
+    ctx.beginPath();
+    ctx.arc(bx, by, br, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = `bold ${Math.max(7/zoom, 9/zoom)}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(agentCount, bx, by);
+  }
+
+  if (isSelected) drawResizeHandles(ws);
+}
+
+function drawResizeHandles(el) {
+  const handles = getResizeHandles(el);
+  ctx.fillStyle = SELECTED_COLOR;
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1/zoom;
+  const hs = 6/zoom;
+  handles.forEach(h => {
+    ctx.fillRect(h.x - hs/2, h.y - hs/2, hs, hs);
+    ctx.strokeRect(h.x - hs/2, h.y - hs/2, hs, hs);
+  });
+}
+
+function getResizeHandles(el) {
+  const cx = el.x + el.w/2, cy = el.y + el.h/2;
+  return [
+    { x: el.x,       y: el.y,       cursor: 'nw-resize', dir: 'nw' },
+    { x: cx,         y: el.y,       cursor: 'n-resize',  dir: 'n'  },
+    { x: el.x+el.w,  y: el.y,       cursor: 'ne-resize', dir: 'ne' },
+    { x: el.x+el.w,  y: cy,         cursor: 'e-resize',  dir: 'e'  },
+    { x: el.x+el.w,  y: el.y+el.h, cursor: 'se-resize', dir: 'se' },
+    { x: cx,         y: el.y+el.h, cursor: 's-resize',  dir: 's'  },
+    { x: el.x,       y: el.y+el.h, cursor: 'sw-resize', dir: 'sw' },
+    { x: el.x,       y: cy,         cursor: 'w-resize',  dir: 'w'  },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HIT TESTING
+// ═══════════════════════════════════════════════════════════
+function ptInRect(px, py, el) {
+  return px >= el.x && px <= el.x + el.w && py >= el.y && py <= el.y + el.h;
+}
+
+function hitTestResizeHandle(px, py, el) {
+  const hs = 8/zoom;
+  for (const h of getResizeHandles(el)) {
+    if (Math.abs(px - h.x) <= hs/2 && Math.abs(py - h.y) <= hs/2) {
+      return h;
+    }
+  }
+  return null;
+}
+
+function elementAt(px, py) {
+  // Top-down (workstations first, then sectors, floors, buildings)
+  for (let i = state.workstations.length - 1; i >= 0; i--) {
+    if (ptInRect(px, py, state.workstations[i])) return { el: state.workstations[i], type: 'workstation' };
+  }
+  for (let i = state.sectors.length - 1; i >= 0; i--) {
+    if (ptInRect(px, py, state.sectors[i])) return { el: state.sectors[i], type: 'sector' };
+  }
+  for (let i = state.floors.length - 1; i >= 0; i--) {
+    if (ptInRect(px, py, state.floors[i])) return { el: state.floors[i], type: 'floor' };
+  }
+  for (let i = state.buildings.length - 1; i >= 0; i--) {
+    if (ptInRect(px, py, state.buildings[i])) return { el: state.buildings[i], type: 'building' };
+  }
+  return null;
+}
+
+function getElement(id) {
+  for (const arr of [state.workstations, state.sectors, state.floors, state.buildings]) {
+    const e = arr.find(x => x.id === id);
+    if (e) return e;
+  }
+  return null;
+}
+
+function getElementType(id) {
+  if (state.buildings.find(x => x.id === id)) return 'building';
+  if (state.floors.find(x => x.id === id)) return 'floor';
+  if (state.sectors.find(x => x.id === id)) return 'sector';
+  if (state.workstations.find(x => x.id === id)) return 'workstation';
+  return null;
+}
+
+function getArrayForType(type) {
+  return state[type === 'building' ? 'buildings' :
+               type === 'floor' ? 'floors' :
+               type === 'sector' ? 'sectors' : 'workstations'];
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MOUSE EVENTS
+// ═══════════════════════════════════════════════════════════
+let lastMouseWorld = { x: 0, y: 0 };
+
+canvas.addEventListener('mousemove', e => {
+  const w = toWorld(e.clientX, e.clientY);
+  lastMouseWorld = w;
+  document.getElementById('info-x').textContent = Math.round(w.x);
+  document.getElementById('info-y').textContent = Math.round(w.y);
+
+  if (currentTool === 'select') {
+    // Resize
+    if (resizing && resizeHandle) {
+      applyResize(w);
+      draw();
+      return;
+    }
+    // Drag
+    if (isDragging && selectedIds.length > 0) {
+      const dx = w.x - dragStartPos.x;
+      const dy = w.y - dragStartPos.y;
+      selectedIds.forEach(id => {
+        const el = getElement(id);
+        const st = dragElemStart[id];
+        if (el && st) { el.x = st.x + dx; el.y = st.y + dy; }
+      });
+      draw();
+      return;
+    }
+    // Hover
+    const hit = elementAt(w.x, w.y);
+    const newHover = hit ? hit.el.id : null;
+    if (newHover !== hoveredId) { hoveredId = newHover; draw(); }
+    // Cursor
+    let cur = 'default';
+    if (hit) {
+      // Check resize handles for selected
+      if (selectedIds.includes(hit.el.id)) {
+        const h = hitTestResizeHandle(w.x, w.y, hit.el);
+        if (h) { cur = h.cursor; }
+        else { cur = 'move'; }
+      } else { cur = 'pointer'; }
+    }
+    canvas.style.cursor = cur;
+  } else {
+    // Drawing mode
+    canvas.style.cursor = 'crosshair';
+    if (isDrawing && drawStart) {
+      drawRect = normalizeRect(drawStart.x, drawStart.y, w.x, w.y);
+      draw();
+    }
+  }
+});
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  const w = toWorld(e.clientX, e.clientY);
+
+  if (currentTool === 'select') {
+    const hit = elementAt(w.x, w.y);
+    if (hit) {
+      // Check resize handle first
+      if (selectedIds.includes(hit.el.id)) {
+        const h = hitTestResizeHandle(w.x, w.y, hit.el);
+        if (h) {
+          resizing = true;
+          resizeHandle = h;
+          resizeElemStart = { ...hit.el };
+          dragStartPos = { ...w };
+          return;
+        }
+      }
+
+      if (assignMode) {
+        // Assign selected agents to a workstation
+        if (getElementType(hit.el.id) === 'workstation') {
+          doAssignAgentsToWorkstation(hit.el.id);
+        }
+        return;
+      }
+
+      // Normal selection
+      if (e.shiftKey) {
+        if (selectedIds.includes(hit.el.id)) {
+          selectedIds = selectedIds.filter(id => id !== hit.el.id);
+        } else {
+          selectedIds.push(hit.el.id);
+        }
+      } else {
+        if (!selectedIds.includes(hit.el.id)) {
+          selectedIds = [hit.el.id];
+        }
+      }
+      isDragging = true;
+      dragStartPos = { ...w };
+      dragElemStart = {};
+      selectedIds.forEach(id => {
+        const el = getElement(id);
+        if (el) dragElemStart[id] = { x: el.x, y: el.y };
+      });
+    } else {
+      selectedIds = [];
+    }
+    updatePropsPanel();
+    draw();
+  } else {
+    // Drawing
+    isDrawing = true;
+    drawStart = { ...w };
+    drawRect = null;
+  }
+});
+
+canvas.addEventListener('mouseup', e => {
+  if (e.button !== 0) return;
+  const w = toWorld(e.clientX, e.clientY);
+
+  if (resizing) {
+    resizing = false;
+    resizeHandle = null;
+    saveHistory();
+    draw();
+    return;
+  }
+
+  if (isDragging) {
+    isDragging = false;
+    const dx = w.x - dragStartPos.x;
+    const dy = w.y - dragStartPos.y;
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) saveHistory();
+    draw();
+    return;
+  }
+
+  if (isDrawing && drawStart) {
+    isDrawing = false;
+    const rect = normalizeRect(drawStart.x, drawStart.y, w.x, w.y);
+    drawStart = null; drawRect = null;
+
+    if (rect.w < 20 || rect.h < 20) { draw(); return; }
+
+    // Validate parent containment
+    if (currentTool === 'floor') {
+      const parent = findContaining('building', rect);
+      if (!parent) { showToast('⚠ El piso debe estar dentro de un Edificio', 'warn'); draw(); return; }
+    }
+    if (currentTool === 'sector') {
+      const parent = findContaining('floor', rect);
+      if (!parent) { showToast('⚠ El sector debe estar dentro de un Piso', 'warn'); draw(); return; }
+    }
+    if (currentTool === 'workstation') {
+      const parent = findContaining('sector', rect);
+      if (!parent) { showToast('⚠ El puesto debe estar dentro de un Sector', 'warn'); draw(); return; }
+    }
+
+    pendingRect = rect;
+    openNameModal(currentTool);
+    draw();
+  }
+});
+
+canvas.addEventListener('dblclick', e => {
+  const w = toWorld(e.clientX, e.clientY);
+  const hit = elementAt(w.x, w.y);
+  if (hit) {
+    // Edit name on dblclick
+    selectedIds = [hit.el.id];
+    pendingEdit = hit.el.id;
+    document.getElementById('modal-name-title').textContent = 'Renombrar elemento';
+    document.getElementById('elem-name-input').value = hit.el.name || '';
+    showModal('modal-name');
+    updatePropsPanel();
+    draw();
+  }
+});
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    deleteSelected();
+  }
+  if (e.key === 'Escape') {
+    selectedIds = [];
+    selectedAgentIds = [];
+    isDrawing = false; drawStart = null; drawRect = null;
+    assignMode = false;
+    document.getElementById('tool-assign').classList.remove('active');
+    updatePropsPanel();
+    draw();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    undo();
+  }
+  // Tool shortcuts
+  if (e.key === 's' && !e.ctrlKey) setTool('select');
+  if (e.key === 'b') setTool('building');
+  if (e.key === 'p') setTool('floor');
+  if (e.key === 'r') setTool('sector');
+  if (e.key === 'w') setTool('workstation');
+});
+
+// ═══════════════════════════════════════════════════════════
+//  RESIZE LOGIC
+// ═══════════════════════════════════════════════════════════
+function applyResize(w) {
+  const el = getElement(selectedIds[0]);
+  if (!el || !resizeElemStart) return;
+  const dx = w.x - dragStartPos.x;
+  const dy = w.y - dragStartPos.y;
+  const s = resizeElemStart;
+  const minS = 30;
+
+  const dir = resizeHandle.dir;
+  if (dir.includes('e')) el.w = Math.max(minS, s.w + dx);
+  if (dir.includes('s')) el.h = Math.max(minS, s.h + dy);
+  if (dir.includes('w')) { const nw = Math.max(minS, s.w - dx); el.x = s.x + (s.w - nw); el.w = nw; }
+  if (dir.includes('n')) { const nh = Math.max(minS, s.h - dy); el.y = s.y + (s.h - nh); el.h = nh; }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+function normalizeRect(x1, y1, x2, y2) {
+  return {
+    x: Math.min(x1, x2),
+    y: Math.min(y1, y2),
+    w: Math.abs(x2 - x1),
+    h: Math.abs(y2 - y1)
+  };
+}
+
+function findContaining(type, rect) {
+  const arr = type === 'building' ? state.buildings :
+              type === 'floor' ? state.floors :
+              state.sectors;
+  // Find last (topmost) that fully or mostly contains the rect center
+  const cx = rect.x + rect.w/2, cy = rect.y + rect.h/2;
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (ptInRect(cx, cy, arr[i])) return arr[i];
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PENDING ELEMENT (name modal flow)
+// ═══════════════════════════════════════════════════════════
+let pendingRect = null;
+let pendingType = null;
+let pendingEdit  = null;
+
+function openNameModal(type) {
+  pendingType = type;
+  pendingEdit = null;
+  const names = { building: 'Edificio', floor: 'Piso', sector: 'Sector', workstation: 'Puesto de Trabajo' };
+  document.getElementById('modal-name-title').textContent = `Crear ${names[type] || type}`;
+  document.getElementById('elem-name-input').value = '';
+  showModal('modal-name');
+  setTimeout(() => document.getElementById('elem-name-input').focus(), 100);
+}
+
+function confirmNameModal() {
+  const name = document.getElementById('elem-name-input').value.trim() || '(sin nombre)';
+  closeModal('modal-name');
+
+  if (pendingEdit) {
+    // Rename
+    const el = getElement(pendingEdit);
+    if (el) { saveHistory(); el.name = name; }
+    pendingEdit = null;
+    draw();
+    updatePropsPanel();
+    updateStructureTree();
+    return;
+  }
+
+  if (!pendingRect || !pendingType) return;
+  saveHistory();
+
+  const id = genId(pendingType.substring(0,3));
+  const el = { id, name, ...pendingRect };
+
+  if (pendingType === 'floor') {
+    el.buildingId = findContaining('building', pendingRect)?.id || null;
+    state.floors.push(el);
+  } else if (pendingType === 'sector') {
+    el.floorId = findContaining('floor', pendingRect)?.id || null;
+    state.sectors.push(el);
+  } else if (pendingType === 'workstation') {
+    el.sectorId = findContaining('sector', pendingRect)?.id || null;
+    el.agentIds = [];
+    state.workstations.push(el);
+  } else {
+    state.buildings.push(el);
+  }
+
+  selectedIds = [id];
+  pendingRect = null;
+  draw();
+  updatePropsPanel();
+  updateStructureTree();
+  showToast(`✓ ${name} creado`);
+}
+
+function cancelNameModal() {
+  closeModal('modal-name');
+  pendingRect = null;
+  pendingEdit = null;
+  draw();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DELETE
+// ═══════════════════════════════════════════════════════════
+function deleteSelected() {
+  if (selectedIds.length === 0) return;
+  saveHistory();
+  selectedIds.forEach(id => {
+    const type = getElementType(id);
+    if (!type) return;
+    const arr = getArrayForType(type);
+    const idx = arr.findIndex(x => x.id === id);
+    if (idx !== -1) arr.splice(idx, 1);
+    // Cascade: remove children
+    if (type === 'building') {
+      const floorIds = state.floors.filter(f => f.buildingId === id).map(f => f.id);
+      state.floors = state.floors.filter(f => f.buildingId !== id);
+      const sectorIds = state.sectors.filter(s => floorIds.includes(s.floorId)).map(s => s.id);
+      state.sectors = state.sectors.filter(s => !floorIds.includes(s.floorId));
+      state.workstations = state.workstations.filter(w => !sectorIds.includes(w.sectorId));
+    }
+    if (type === 'floor') {
+      const sectorIds = state.sectors.filter(s => s.floorId === id).map(s => s.id);
+      state.sectors = state.sectors.filter(s => s.floorId !== id);
+      state.workstations = state.workstations.filter(w => !sectorIds.includes(w.sectorId));
+    }
+    if (type === 'sector') {
+      state.workstations = state.workstations.filter(w => w.sectorId !== id);
+    }
+    if (type === 'workstation') {
+      // Remove agent assignments
+      state.workstations.forEach(w => { if (w.id !== id) return; w.agentIds = []; });
+    }
+  });
+  selectedIds = [];
+  draw();
+  updatePropsPanel();
+  updateStructureTree();
+  updateAgentList();
+  showToast('🗑 Elemento(s) eliminado(s)');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOOLS
+// ═══════════════════════════════════════════════════════════
+function setTool(tool) {
+  currentTool = tool;
+  selectedIds = [];
+  isDrawing = false; drawStart = null; drawRect = null;
+  assignMode = false;
+  document.getElementById('tool-assign').classList.remove('active');
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-' + tool);
+  if (btn) btn.classList.add('active');
+  canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+  updatePropsPanel();
+  draw();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ZOOM / PAN
+// ═══════════════════════════════════════════════════════════
+function applyZoom(newZoom) {
+  zoom = Math.max(0.2, Math.min(3, newZoom));
+  canvas.style.transform = `scale(${zoom})`;
+  canvas.style.transformOrigin = '0 0';
+  document.getElementById('info-zoom').textContent = Math.round(zoom * 100);
+  document.getElementById('zoom-label').textContent = Math.round(zoom * 100) + '%';
+  draw();
+}
+function zoomIn() { applyZoom(zoom * 1.2); }
+function zoomOut() { applyZoom(zoom / 1.2); }
+function resetZoom() { applyZoom(1); }
+function fitView() {
+  // Fit all elements
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const all = [...state.buildings, ...state.floors, ...state.sectors, ...state.workstations];
+  if (all.length === 0) { resetZoom(); return; }
+  all.forEach(el => {
+    minX = Math.min(minX, el.x); minY = Math.min(minY, el.y);
+    maxX = Math.max(maxX, el.x + el.w); maxY = Math.max(maxY, el.y + el.h);
+  });
+  const container = document.getElementById('canvas-container');
+  const cw = container.clientWidth - 60, ch = container.clientHeight - 60;
+  const ew = maxX - minX, eh = maxY - minY;
+  applyZoom(Math.min(cw / ew, ch / eh, 2));
+}
+
+// Mouse wheel zoom
+document.getElementById('canvas-container').addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  applyZoom(zoom * delta);
+}, { passive: false });
+
+// ═══════════════════════════════════════════════════════════
+//  HISTORY (UNDO)
+// ═══════════════════════════════════════════════════════════
+function saveHistory() {
+  history.push(JSON.stringify(state));
+  if (history.length > HISTORY_MAX) history.shift();
+}
+function undo() {
+  if (history.length === 0) { showToast('Nada que deshacer'); return; }
+  state = JSON.parse(history.pop());
+  draw();
+  updatePropsPanel();
+  updateStructureTree();
+  updateAgentList();
+  showToast('↩ Deshacer');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AGENTS
+// ═══════════════════════════════════════════════════════════
+function openAgentModal() {
+  ['ag-nombre','ag-apellido','ag-legajo','ag-cargo','ag-area'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('ag-org').value = 'ENRE';
+  showModal('modal-agent');
+}
+
+function saveAgent() {
+  const nombre = document.getElementById('ag-nombre').value.trim();
+  const apellido = document.getElementById('ag-apellido').value.trim();
+  if (!nombre || !apellido) { alert('Nombre y apellido son obligatorios'); return; }
+  saveHistory();
+  const agent = {
+    id: genId('ag'),
+    nombre, apellido,
+    legajo: document.getElementById('ag-legajo').value.trim(),
+    org: document.getElementById('ag-org').value,
+    cargo: document.getElementById('ag-cargo').value.trim(),
+    area: document.getElementById('ag-area').value.trim()
+  };
+  state.agents.push(agent);
+  closeModal('modal-agent');
+  updateAgentList();
+  updateStructureTree();
+  showToast(`✓ Agente ${nombre} ${apellido} agregado`);
+}
+
+function agentAssignedWs(agentId) {
+  return state.workstations.find(w => (w.agentIds || []).includes(agentId));
+}
+
+function updateAgentList(filter) {
+  const list = document.getElementById('agent-list');
+  const agents = filter
+    ? state.agents.filter(a =>
+        `${a.nombre} ${a.apellido} ${a.legajo} ${a.org}`.toLowerCase().includes(filter.toLowerCase()))
+    : state.agents;
+
+  if (agents.length === 0) {
+    list.innerHTML = `<div class="empty-state" style="padding:16px"><div class="icon">👤</div>Sin agentes aún</div>`;
+    return;
+  }
+
+  list.innerHTML = agents.map(a => {
+    const ws = agentAssignedWs(a.id);
+    const sel = selectedAgentIds.includes(a.id);
+    const initials = `${a.nombre[0]}${a.apellido[0]}`.toUpperCase();
+    return `<div class="agent-item ${sel ? 'selected' : ''}" onclick="toggleAgentSelect('${a.id}', event)">
+      <div class="agent-avatar ${a.org.toLowerCase()}">${initials}</div>
+      <div class="agent-info">
+        <div class="agent-name">${a.apellido}, ${a.nombre}</div>
+        <div class="agent-org">${a.org} · ${a.cargo || 'Sin cargo'}</div>
+      </div>
+      <span class="agent-badge ${ws ? 'badge-assigned' : 'badge-free'}">${ws ? '●' : '○'}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleAgentSelect(id, event) {
+  if (event.shiftKey || event.ctrlKey) {
+    if (selectedAgentIds.includes(id)) {
+      selectedAgentIds = selectedAgentIds.filter(x => x !== id);
+    } else {
+      selectedAgentIds.push(id);
+    }
+  } else {
+    if (selectedAgentIds.includes(id) && selectedAgentIds.length === 1) {
+      selectedAgentIds = [];
+    } else {
+      selectedAgentIds = [id];
+    }
+  }
+  updateAgentList(document.getElementById('agent-search').value);
+  updateInfoBar();
+}
+
+function filterAgents(val) {
+  updateAgentList(val);
+}
+
+function updateInfoBar() {
+  const sel = document.getElementById('info-selection');
+  if (selectedAgentIds.length > 0) {
+    sel.textContent = `${selectedAgentIds.length} agente(s) seleccionado(s)`;
+  } else if (selectedIds.length > 0) {
+    sel.textContent = `Elemento seleccionado`;
+  } else {
+    sel.textContent = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ASSIGN AGENTS
+// ═══════════════════════════════════════════════════════════
+function startAssignMode() {
+  if (selectedAgentIds.length === 0) {
+    showToast('⚠ Selecciona al menos un agente en el panel izquierdo');
+    return;
+  }
+  // Open assign modal
+  const count = selectedAgentIds.length;
+  document.getElementById('assign-agent-count').textContent = count;
+
+  // Build workstation options
+  const sel = document.getElementById('assign-ws-select');
+  sel.innerHTML = '<option value="">— Seleccionar puesto —</option>' +
+    state.workstations.map(ws => {
+      const sector = state.sectors.find(s => s.id === ws.sectorId);
+      const floor = sector ? state.floors.find(f => f.id === sector.floorId) : null;
+      const building = floor ? state.buildings.find(b => b.id === floor.buildingId) : null;
+      const path = [building?.name, floor?.name, sector?.name, ws.name].filter(Boolean).join(' › ');
+      return `<option value="${ws.id}">${path} (${(ws.agentIds||[]).length} asignados)</option>`;
+    }).join('');
+
+  // Preview agents
+  const preview = document.getElementById('assign-agents-preview');
+  const names = selectedAgentIds.map(id => {
+    const a = state.agents.find(x => x.id === id);
+    return a ? `${a.nombre} ${a.apellido}` : id;
+  });
+  preview.innerHTML = `<p style="font-size:11px;color:var(--gray-400)">Agentes: ${names.join(', ')}</p>`;
+
+  showModal('modal-assign');
+}
+
+function doAssignAgentsToWorkstation(wsId) {
+  if (selectedAgentIds.length === 0) return;
+  saveHistory();
+  const ws = state.workstations.find(w => w.id === wsId);
+  if (!ws) return;
+  if (!ws.agentIds) ws.agentIds = [];
+  selectedAgentIds.forEach(aid => {
+    // Remove from any existing workstation
+    state.workstations.forEach(w => {
+      if (w.id !== wsId) w.agentIds = (w.agentIds||[]).filter(x => x !== aid);
+    });
+    if (!ws.agentIds.includes(aid)) ws.agentIds.push(aid);
+  });
+  selectedAgentIds = [];
+  assignMode = false;
+  document.getElementById('tool-assign').classList.remove('active');
+  draw();
+  updateAgentList();
+  updatePropsPanel();
+  showToast(`✓ ${ws.agentIds.length} agente(s) asignados a "${ws.name}"`);
+}
+
+function confirmAssign() {
+  const wsId = document.getElementById('assign-ws-select').value;
+  if (!wsId) { alert('Selecciona un puesto de trabajo'); return; }
+  closeModal('modal-assign');
+  doAssignAgentsToWorkstation(wsId);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROPERTIES PANEL
+// ═══════════════════════════════════════════════════════════
+function updatePropsPanel() {
+  const body = document.getElementById('props-body');
+  if (selectedIds.length === 0) {
+    body.innerHTML = `<div class="empty-state"><div class="icon">↖</div>Selecciona un elemento en el canvas para ver sus propiedades</div>`;
+    return;
+  }
+
+  const id = selectedIds[0];
+  const type = getElementType(id);
+  const el = getElement(id);
+  if (!el) { body.innerHTML = ''; return; }
+
+  const typeLabels = { building:'Edificio', floor:'Piso', sector:'Sector', workstation:'Puesto de Trabajo' };
+  const typeClasses = { building:'type-building', floor:'type-floor', sector:'type-sector', workstation:'type-workstation' };
+
+  let html = `
+    <div class="prop-group">
+      <span class="type-badge ${typeClasses[type]}">${typeLabels[type]}</span>
+    </div>
+    <div class="prop-group">
+      <div class="prop-label">Nombre</div>
+      <input class="prop-input" value="${el.name || ''}" onchange="renameElement('${id}', this.value)" placeholder="Nombre...">
+    </div>
+    <div class="prop-group">
+      <div class="prop-label">Posición y Tamaño</div>
+      <div class="prop-row">
+        <input class="prop-input" type="number" value="${Math.round(el.x)}" onchange="updateElemProp('${id}','x',+this.value)" placeholder="X">
+        <input class="prop-input" type="number" value="${Math.round(el.y)}" onchange="updateElemProp('${id}','y',+this.value)" placeholder="Y">
+      </div>
+      <div class="prop-row" style="margin-top:4px">
+        <input class="prop-input" type="number" value="${Math.round(el.w)}" onchange="updateElemProp('${id}','w',+this.value)" placeholder="Ancho">
+        <input class="prop-input" type="number" value="${Math.round(el.h)}" onchange="updateElemProp('${id}','h',+this.value)" placeholder="Alto">
+      </div>
+    </div>`;
+
+  if (type === 'floor') {
+    const b = state.buildings.find(b => b.id === el.buildingId);
+    html += `<div class="prop-group"><div class="prop-label">Edificio</div><div style="font-size:12px;color:var(--gray-600)">${b?.name || '(sin asignar)'}</div></div>`;
+  }
+  if (type === 'sector') {
+    const f = state.floors.find(f => f.id === el.floorId);
+    html += `<div class="prop-group"><div class="prop-label">Piso</div><div style="font-size:12px;color:var(--gray-600)">${f?.name || '(sin asignar)'}</div></div>`;
+  }
+
+  if (type === 'workstation') {
+    const sector = state.sectors.find(s => s.id === el.sectorId);
+    html += `<div class="prop-group"><div class="prop-label">Sector</div><div style="font-size:12px;color:var(--gray-600)">${sector?.name || '(sin asignar)'}</div></div>`;
+    html += `<div class="divider"></div>`;
+
+    const assignedAgents = (el.agentIds || []).map(aid => state.agents.find(a => a.id === aid)).filter(Boolean);
+    html += `<div class="prop-group">
+      <div class="prop-label">Agentes Asignados (${assignedAgents.length})</div>
+      <div class="assign-list">`;
+    if (assignedAgents.length === 0) {
+      html += `<div style="font-size:11px;color:var(--gray-400);padding:6px 0">Ningún agente asignado</div>`;
+    } else {
+      assignedAgents.forEach(a => {
+        html += `<div class="assign-item assigned-here">
+          <div class="agent-avatar ${a.org.toLowerCase()}" style="width:22px;height:22px;font-size:9px">${a.nombre[0]}${a.apellido[0]}</div>
+          <div style="flex:1;font-size:11px"><strong>${a.apellido}, ${a.nombre}</strong><br><span style="color:var(--gray-400)">${a.org} · ${a.cargo||'-'}</span></div>
+          <button style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:12px" onclick="unassignAgent('${a.id}','${id}')">✕</button>
+        </div>`;
+      });
+    }
+    html += `</div>
+    <button class="btn btn-sm btn-orange" style="width:100%;margin-top:8px" onclick="assignFromProps('${id}')">+ Asignar Agentes</button>
+    </div>`;
+  }
+
+  html += `<div class="divider"></div>
+    <button class="btn btn-sm btn-danger" style="width:100%" onclick="deleteSelected()">🗑 Eliminar</button>`;
+
+  body.innerHTML = html;
+}
+
+function renameElement(id, name) {
+  const el = getElement(id);
+  if (el) { el.name = name; draw(); updateStructureTree(); }
+}
+
+function updateElemProp(id, prop, val) {
+  const el = getElement(id);
+  if (el) { el[prop] = val; draw(); }
+}
+
+function unassignAgent(agentId, wsId) {
+  const ws = state.workstations.find(w => w.id === wsId);
+  if (ws) { ws.agentIds = (ws.agentIds||[]).filter(x => x !== agentId); }
+  draw();
+  updatePropsPanel();
+  updateAgentList();
+}
+
+function assignFromProps(wsId) {
+  // Pre-select all free agents or show the assign modal
+  selectedIds = [wsId];
+  if (selectedAgentIds.length === 0) {
+    showToast('Selecciona agentes en el panel izquierdo primero (clic en agentes)');
+    return;
+  }
+  doAssignAgentsToWorkstation(wsId);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STRUCTURE TREE
+// ═══════════════════════════════════════════════════════════
+function updateStructureTree() {
+  const tree = document.getElementById('structure-tree');
+  if (state.buildings.length === 0) {
+    tree.innerHTML = `<div class="empty-state" style="padding:12px;font-size:11px">Sin edificios aún</div>`;
+    return;
+  }
+
+  let html = '';
+  state.buildings.forEach(b => {
+    const floors = state.floors.filter(f => f.buildingId === b.id);
+    const bSel = selectedIds.includes(b.id) ? 'selected' : '';
+    html += `<div class="tree-node">
+      <div class="tree-node-header ${bSel}" onclick="selectFromTree('${b.id}')">
+        <span class="tree-icon">🏛</span> ${b.name}
+      </div>
+      <div class="tree-node-children">`;
+    floors.forEach(f => {
+      const sectors = state.sectors.filter(s => s.floorId === f.id);
+      const fSel = selectedIds.includes(f.id) ? 'selected' : '';
+      html += `<div class="tree-node">
+        <div class="tree-node-header ${fSel}" onclick="selectFromTree('${f.id}')">
+          <span class="tree-icon">📐</span> ${f.name}
+        </div>
+        <div class="tree-node-children">`;
+      sectors.forEach(s => {
+        const wss = state.workstations.filter(w => w.sectorId === s.id);
+        const sSel = selectedIds.includes(s.id) ? 'selected' : '';
+        html += `<div class="tree-node">
+          <div class="tree-node-header ${sSel}" onclick="selectFromTree('${s.id}')">
+            <span class="tree-icon">🔷</span> ${s.name}
+          </div>
+          <div class="tree-node-children">`;
+        wss.forEach(w => {
+          const wSel = selectedIds.includes(w.id) ? 'selected' : '';
+          const cnt = (w.agentIds||[]).length;
+          html += `<div class="tree-node-header ${wSel}" onclick="selectFromTree('${w.id}')">
+            <span class="tree-icon">💼</span> ${w.name} ${cnt > 0 ? `<span style="color:var(--green);font-size:9px">(${cnt})</span>` : ''}
+          </div>`;
+        });
+        html += `</div></div>`;
+      });
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  // Unparented floors / sectors / workstations
+  const orphanFloors = state.floors.filter(f => !f.buildingId || !state.buildings.find(b => b.id === f.buildingId));
+  if (orphanFloors.length > 0) {
+    html += `<div style="font-size:10px;color:var(--gray-400);padding:6px 8px">Sin edificio asignado:</div>`;
+    orphanFloors.forEach(f => {
+      html += `<div class="tree-node-header" onclick="selectFromTree('${f.id}')"><span class="tree-icon">📐</span> ${f.name}</div>`;
+    });
+  }
+
+  tree.innerHTML = html;
+}
+
+function selectFromTree(id) {
+  selectedIds = [id];
+  draw();
+  updatePropsPanel();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════════════
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+});
+
+// Enter key in name modal
+document.getElementById('elem-name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmNameModal();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  PANEL TOGGLES
+// ═══════════════════════════════════════════════════════════
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  const icon = document.getElementById(id + '-icon');
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    if (icon) icon.textContent = '▾';
+  } else {
+    el.style.display = 'none';
+    if (icon) icon.textContent = '▸';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  JSON PANEL
+// ═══════════════════════════════════════════════════════════
+function toggleJson() {
+  const panel = document.getElementById('json-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('json-content').textContent = JSON.stringify(state, null, 2);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PERSIST
+// ═══════════════════════════════════════════════════════════
+function saveToStorage() {
+  try {
+    localStorage.setItem('fusion-planner-state', JSON.stringify(state));
+    localStorage.setItem('fusion-planner-nextId', nextId);
+    showToast('💾 Guardado en el navegador');
+  } catch(e) {
+    showToast('⚠ Error al guardar: ' + e.message);
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem('fusion-planner-state');
+    const savedId = localStorage.getItem('fusion-planner-nextId');
+    if (saved) {
+      state = JSON.parse(saved);
+      // Ensure agentIds arrays exist
+      state.workstations.forEach(w => { if (!w.agentIds) w.agentIds = []; });
+      if (savedId) nextId = parseInt(savedId);
+      showToast('✓ Estado restaurado');
+    }
+  } catch(e) {
+    console.error('Error loading state:', e);
+  }
+}
+
+function exportJson() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fusion-puestos.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇ JSON exportado');
+}
+
+function importJson() {
+  document.getElementById('import-file').click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      saveHistory();
+      state = imported;
+      state.workstations.forEach(w => { if (!w.agentIds) w.agentIds = []; });
+      draw();
+      updateAgentList();
+      updateStructureTree();
+      updatePropsPanel();
+      showToast('✓ JSON importado');
+    } catch(err) {
+      alert('Error al leer el archivo JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function clearAll() {
+  if (!confirm('¿Eliminar todo el contenido del canvas? Esta acción no se puede deshacer.')) return;
+  saveHistory();
+  state = { buildings: [], floors: [], sectors: [], workstations: [], agents: [] };
+  selectedIds = []; selectedAgentIds = [];
+  draw(); updateAgentList(); updateStructureTree(); updatePropsPanel();
+  showToast('🗑 Canvas limpiado');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTO-SAVE
+// ═══════════════════════════════════════════════════════════
+setInterval(() => {
+  try { localStorage.setItem('fusion-planner-state', JSON.stringify(state)); } catch(e) {}
+}, 30000);
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+loadFromStorage();
+updateAgentList();
+updateStructureTree();
+draw();
+
+// ─── Seed demo data if empty ──────────────────────────────
+if (state.buildings.length === 0 && state.agents.length === 0) {
+  // Demo agents
+  const demoAgents = [
+    { id:'ag_demo1', nombre:'María', apellido:'González', legajo:'E-001', org:'ENRE', cargo:'Analista', area:'Regulación' },
+    { id:'ag_demo2', nombre:'Carlos', apellido:'Rodríguez', legajo:'E-002', org:'ENRE', cargo:'Jefe de Área', area:'Fiscalización' },
+    { id:'ag_demo3', nombre:'Ana', apellido:'Martínez', legajo:'G-001', org:'ENARGAS', cargo:'Técnica', area:'Gas Natural' },
+    { id:'ag_demo4', nombre:'Luis', apellido:'Fernández', legajo:'G-002', org:'ENARGAS', cargo:'Coordinador', area:'Distribución' },
+    { id:'ag_demo5', nombre:'Patricia', apellido:'López', legajo:'E-003', org:'ENRE', cargo:'Administrativa', area:'RRHH' },
+  ];
+  state.agents = demoAgents;
+  nextId = 100;
+
+  // Demo layout
+  state.buildings.push({ id:'b1', name:'Edificio Central', x:60, y:60, w:560, h:420 });
+  state.floors.push({ id:'f1', name:'Piso 1 (PB)', buildingId:'b1', x:80, y:110, w:520, h:160 });
+  state.floors.push({ id:'f2', name:'Piso 2', buildingId:'b1', x:80, y:290, w:520, h:170 });
+  state.sectors.push({ id:'s1', name:'Sector Regulación', floorId:'f1', x:100, y:130, w:230, h:120 });
+  state.sectors.push({ id:'s2', name:'Sector Administración', floorId:'f1', x:350, y:130, w:230, h:120 });
+  state.sectors.push({ id:'s3', name:'Sector Técnico', floorId:'f2', x:100, y:310, w:490, h:120 });
+  state.workstations.push({ id:'w1', name:'Puesto 1A', sectorId:'s1', x:115, y:160, w:80, h:70, agentIds:['ag_demo1'] });
+  state.workstations.push({ id:'w2', name:'Puesto 1B', sectorId:'s1', x:215, y:160, w:80, h:70, agentIds:['ag_demo2'] });
+  state.workstations.push({ id:'w3', name:'Puesto 2A', sectorId:'s2', x:365, y:160, w:80, h:70, agentIds:['ag_demo3'] });
+  state.workstations.push({ id:'w4', name:'Puesto 3A', sectorId:'s3', x:115, y:340, w:80, h:70, agentIds:['ag_demo4','ag_demo5'] });
+
+  draw();
+  updateAgentList();
+  updateStructureTree();
+  showToast('✨ Datos de ejemplo cargados');
+}
+</script>
+</body>
+</html>
